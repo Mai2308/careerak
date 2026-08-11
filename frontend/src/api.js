@@ -36,3 +36,32 @@ export async function login(payload){
   })
   return parseResponse(res)
 }
+
+function authHeaders(){
+  const token = sessionStorage.getItem('token') || '';
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+export async function createMentor(profile){
+  const res = await fetch(`${API_BASE}/api/mentors`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(profile)
+  });
+  return parseResponse(res);
+}
+
+export async function getMyMentor(){
+  const res = await fetch(`${API_BASE}/api/mentors/me`, { headers: authHeaders() });
+  return parseResponse(res);
+}
+
+export async function getMentors(){
+  const res = await fetch(`${API_BASE}/api/mentors`);
+  return parseResponse(res);
+}
+
+export async function getMentorById(id){
+  const res = await fetch(`${API_BASE}/api/mentors/${id}`);
+  return parseResponse(res);
+}

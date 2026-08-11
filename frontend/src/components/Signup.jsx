@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { register } from '../api'
+import { register, createMentor } from '../api'
 
 export default function Signup({ onAuth }){
   const [form, setForm] = useState({ name:'', email:'', password:'', role:'student', interests:'', educationLevel:'undergraduate' })
@@ -27,6 +27,18 @@ export default function Signup({ onAuth }){
       const payload = { ...form, interests: form.interests.split(',').map(s=>s.trim()).filter(Boolean) }
       const res = await register(payload)
       if (res.token){
+        // store token immediately so subsequent API calls are authenticated
+        try{ sessionStorage.setItem('token', res.token); sessionStorage.setItem('user', JSON.stringify(res.user)); }catch(e){}
+        // If user signed up as mentor, create a mentor profile record then authenticate
+        if (payload.role === 'mentor'){
+          try{
+            // minimal profile created; user can edit later from dashboard
+            await createMentor({ name: payload.name, title: '', bio: '', skills: [], availableSlots: [] });
+          }catch(err){
+            // ignore profile creation error for now
+            console.warn('Failed to create mentor profile', err.message)
+          }
+        }
         onAuth && onAuth({ token: res.token, user: res.user })
       } else {
         setMsg(res.message || 'Registration failed')
