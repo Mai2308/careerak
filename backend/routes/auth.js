@@ -4,9 +4,31 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const JWT_SECRET = process.env.JWT_SECRET;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const RATE_LIMIT_MAX_REQUESTS = 10;
+const authAttempts = new Map();
+
+function authRateLimit(req, res, next) {
+  const key = `${req.path}:${req.ip || 'unknown'}`;
+  const now = Date.now();
+  const current = authAttempts.get(key);
+
+  if (!current || now - current.windowStart > RATE_LIMIT_WINDOW_MS) {
+    authAttempts.set(key, { windowStart: now, count: 1 });
+    return next();
+  }
+
+  if (current.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return res.status(429).json({ message: 'Too many requests. Please try again later.' });
+  }
+
+  current.count += 1;
+  authAttempts.set(key, current);
+  return next();
+}
 
 // Register
-router.post('/register', async (req, res) => {
+router.post('/register', authRateLimit, async (req, res) => {
   try {
     const { name, email, password, role, interests, educationLevel } = req.body;
     if (!name || typeof email !== 'string' || !password) return res.status(400).json({ message: 'Missing fields' });
@@ -26,7 +48,7 @@ router.post('/register', async (req, res) => {
 });
 
 // Login
-router.post('/login', async (req, res) => {
+router.post('/login', authRateLimit, async (req, res) => {
   try {
     const { email, password } = req.body;
     if (typeof email !== 'string' || !password) return res.status(400).json({ message: 'Missing fields' });
