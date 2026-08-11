@@ -1,3 +1,32 @@
+# Careerak
+
+Simple mentor-student matching web app (scaffold).
+
+Folders:
+- `backend` — Express + MongoDB API
+- `frontend` — Vite + React app
+
+Run locally:
+
+1. Backend
+
+```powershell
+cd backend
+npm install
+copy .env.example .env
+# edit .env as needed
+npm run dev
+```
+
+2. Frontend
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+The frontend proxies `/api` to the backend at `http://localhost:5000`.
 # Careerak – Student & Mentor Web Application
 
 ## 📌 Overview
