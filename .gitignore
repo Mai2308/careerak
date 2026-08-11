@@ -1,0 +1,18 @@
+# Ignore node modules for all projects
+node_modules/
+
+# Ignore build output
+build/
+dist/
+
+# Ignore local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Ignore OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
