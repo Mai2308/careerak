@@ -30,7 +30,7 @@ export default function Login({ onAuth }){
         setMsg(res.message || 'Login failed')
       }
     }catch(err){
-      setMsg('Network or server error')
+      setMsg(err.message || 'Network or server error')
     }finally{ setLoading(false) }
   }
 

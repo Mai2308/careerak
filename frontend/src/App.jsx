@@ -8,10 +8,10 @@ export default function App(){
   const [user, setUser] = useState(null)
 
   useEffect(()=>{
-    // restore user from localStorage if present
+    // restore user from sessionStorage if present
     try{
-      const token = localStorage.getItem('token')
-      const userJson = localStorage.getItem('user')
+      const token = sessionStorage.getItem('token')
+      const userJson = sessionStorage.getItem('user')
       if (token && userJson){
         setUser(JSON.parse(userJson))
         setView('dashboard')
@@ -20,15 +20,15 @@ export default function App(){
   },[])
 
   const handleAuth = ({ token, user }) => {
-    localStorage.setItem('token', token)
-    localStorage.setItem('user', JSON.stringify(user))
+    sessionStorage.setItem('token', token)
+    sessionStorage.setItem('user', JSON.stringify(user))
     setUser(user)
     setView('dashboard')
   }
 
   const handleLogout = ()=>{
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
+    sessionStorage.removeItem('token')
+    sessionStorage.removeItem('user')
     setUser(null)
     setView('login')
   }

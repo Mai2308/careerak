@@ -32,7 +32,7 @@ export default function Signup({ onAuth }){
         setMsg(res.message || 'Registration failed')
       }
     }catch(err){
-      setMsg('Network or server error')
+      setMsg(err.message || 'Network or server error')
     }finally{ setLoading(false) }
   }
 
