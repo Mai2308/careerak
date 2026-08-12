@@ -18,6 +18,7 @@ function MentorRating() {
   const [mentorId, setMentorId] = useState(DEFAULT_MENTOR_ID);
   const [reviews, setReviews] = useState([]);
   const [selectedRating, setSelectedRating] = useState(5);
+  const [hoverRating, setHoverRating] = useState(0);
   const [reviewerName, setReviewerName] = useState('');
   const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(true);
@@ -174,16 +175,21 @@ function MentorRating() {
             <label>
               Rating
               <div className="rating-select">
-                {[1, 2, 3, 4, 5].map((value) => (
-                  <button
-                    key={value}
-                    type="button"
-                    className={value <= selectedRating ? 'rating-button selected' : 'rating-button'}
-                    onClick={() => setSelectedRating(value)}
-                  >
-                    ★
-                  </button>
-                ))}
+                {[1, 2, 3, 4, 5].map((value) => {
+                  const isHovered = hoverRating ? value <= hoverRating : value <= selectedRating;
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      className={`rating-button ${isHovered ? 'hovered' : ''}`}
+                      onMouseEnter={() => setHoverRating(value)}
+                      onMouseLeave={() => setHoverRating(0)}
+                      onClick={() => setSelectedRating(value)}
+                    >
+                      ★
+                    </button>
+                  );
+                })}
               </div>
             </label>
 
