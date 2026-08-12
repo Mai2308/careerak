@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import Signup from './components/Signup'
 import Login from './components/Login'
 import Dashboard from './components/Dashboard'
+import Profile from './components/Profile'
+import Explore from './components/Explore'
 
 export default function App(){
   const [view, setView] = useState('signup')
@@ -47,7 +49,13 @@ export default function App(){
       </header>
       <main>
         {user ? (
-          <Dashboard user={user} />
+          view === 'profile' ? (
+            <Profile user={user} onBack={()=>setView('dashboard')} />
+          ) : view === 'explore' ? (
+            <Explore onBack={()=>setView('dashboard')} />
+          ) : (
+            <Dashboard user={user} onViewProfile={()=>setView('profile')} onExplore={()=>setView('explore')} />
+          )
         ) : (
           view === 'signup' ? <Signup onAuth={handleAuth} /> : <Login onAuth={handleAuth} />
         )}
