@@ -51,12 +51,43 @@ export async function login(payload) {
   return parseResponse(res)
 }
 
+function authHeaders() {
+  const token = sessionStorage.getItem('token') || ''
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
+// =======================
+// MENTOR PROFILE (from main)
+// =======================
+
+export async function createMentor(profile) {
+  const res = await fetch(`${API_BASE}/api/mentors`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(profile)
+  })
+  return parseResponse(res)
+}
+
+export async function getMyMentor() {
+  const res = await fetch(`${API_BASE}/api/mentors/me`, { headers: authHeaders() })
+  return parseResponse(res)
+}
+
+export async function getMentors() {
+  const res = await fetch(`${API_BASE}/api/users/mentors`)
+  return parseResponse(res)
+}
+
+export async function getMentorById(id) {
+  const res = await fetch(`${API_BASE}/api/mentors/${id}`)
+  return parseResponse(res)
+}
 
 // =======================
 // AVAILABILITY
 // =======================
 
-// Mentor creates an availability slot
 export async function createAvailability(payload) {
   const res = await fetch(`${API_BASE}/api/availability`, {
     method: 'POST',
@@ -69,8 +100,6 @@ export async function createAvailability(payload) {
   return parseResponse(res)
 }
 
-
-// Get all availability slots for one mentor
 export async function getMentorAvailability(mentorId) {
   const res = await fetch(
     `${API_BASE}/api/availability/mentor/${mentorId}`
@@ -79,13 +108,6 @@ export async function getMentorAvailability(mentorId) {
   return parseResponse(res)
 }
 
-export async function getMentors() {
-  const res = await fetch(`${API_BASE}/api/users/mentors`)
-  return parseResponse(res)
-}
-
-
-// Delete an availability slot
 export async function deleteAvailability(availabilityId) {
   const res = await fetch(
     `${API_BASE}/api/availability/${availabilityId}`,
@@ -97,12 +119,10 @@ export async function deleteAvailability(availabilityId) {
   return parseResponse(res)
 }
 
-
 // =======================
 // BOOKINGS
 // =======================
 
-// Student creates a booking
 export async function createBooking(payload) {
   const res = await fetch(`${API_BASE}/api/bookings`, {
     method: 'POST',
@@ -115,8 +135,6 @@ export async function createBooking(payload) {
   return parseResponse(res)
 }
 
-
-// Get bookings for one student
 export async function getStudentBookings(studentId) {
   const res = await fetch(
     `${API_BASE}/api/bookings/student/${studentId}`
@@ -125,8 +143,6 @@ export async function getStudentBookings(studentId) {
   return parseResponse(res)
 }
 
-
-// Get bookings for one mentor
 export async function getMentorBookings(mentorId) {
   const res = await fetch(
     `${API_BASE}/api/bookings/mentor/${mentorId}`
@@ -135,8 +151,6 @@ export async function getMentorBookings(mentorId) {
   return parseResponse(res)
 }
 
-
-// Cancel a booking
 export async function cancelBooking(bookingId) {
   const res = await fetch(
     `${API_BASE}/api/bookings/${bookingId}/cancel`,
@@ -147,3 +161,4 @@ export async function cancelBooking(bookingId) {
 
   return parseResponse(res)
 }
+

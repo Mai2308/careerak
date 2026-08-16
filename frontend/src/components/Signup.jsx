@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { register } from '../api'
+import { register, createMentor } from '../api'
 
 export default function Signup({ onAuth }){
-  const [form, setForm] = useState({ name:'', email:'', password:'', role:'student', interests:'', educationLevel:'undergraduate' })
+  const [form, setForm] = useState({ name:'', email:'', password:'', confirmPassword:'', role:'student', interests:'', educationLevel:'undergraduate' })
+  const [showPassword, setShowPassword] = useState(false)
   const [msg, setMsg] = useState(null)
   const [errors, setErrors] = useState([])
   const [loading, setLoading] = useState(false)
@@ -13,7 +14,17 @@ export default function Signup({ onAuth }){
     const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
     if (!emailRe.test(form.email)) errs.push('Enter a valid email')
     if (!form.password || form.password.length < 6) errs.push('Password must be at least 6 characters')
+    if (form.password !== form.confirmPassword) errs.push('Passwords must match')
     return errs
+  }
+
+  const handleEducationChange = e => {
+    const value = e.target.value
+    if (value === 'mentor') {
+      setForm({ ...form, role: 'mentor', educationLevel: '' })
+    } else {
+      setForm({ ...form, educationLevel: value })
+    }
   }
 
   const submit = async e => {
@@ -27,6 +38,18 @@ export default function Signup({ onAuth }){
       const payload = { ...form, interests: form.interests.split(',').map(s=>s.trim()).filter(Boolean) }
       const res = await register(payload)
       if (res.token){
+        // store token immediately so subsequent API calls are authenticated
+        try{ sessionStorage.setItem('token', res.token); sessionStorage.setItem('user', JSON.stringify(res.user)); }catch(e){}
+        // If user signed up as mentor, create a mentor profile record then authenticate
+        if (payload.role === 'mentor'){
+          try{
+            // minimal profile created; user can edit later from dashboard
+            await createMentor({ name: payload.name, title: '', bio: '', skills: [], availableSlots: [] });
+          }catch(err){
+            // ignore profile creation error for now
+            console.warn('Failed to create mentor profile', err.message)
+          }
+        }
         onAuth && onAuth({ token: res.token, user: res.user })
       } else {
         setMsg(res.message || 'Registration failed')
@@ -46,16 +69,21 @@ export default function Signup({ onAuth }){
       )}
       <input placeholder="Name" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} required />
       <input placeholder="Email" type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} required />
-      <input placeholder="Password" type="password" value={form.password} onChange={e=>setForm({...form,password:e.target.value})} required />
+      <input placeholder="Password" type={showPassword ? 'text' : 'password'} value={form.password} onChange={e=>setForm({...form,password:e.target.value})} required />
+      <input placeholder="Confirm Password" type={showPassword ? 'text' : 'password'} value={form.confirmPassword} onChange={e=>setForm({...form,confirmPassword:e.target.value})} required />
+      <label style={{ display:'flex', alignItems:'center', gap:'0.5rem', fontSize:'0.9rem', color:'#555' }}>
+        <input type="checkbox" checked={showPassword} onChange={e=>setShowPassword(e.target.checked)} />
+        Show password
+      </label>
       <select value={form.role} onChange={e=>setForm({...form,role:e.target.value})}>
         <option value="student">Student</option>
         <option value="mentor">Mentor</option>
       </select>
       {form.role === 'student' && (
-        <select value={form.educationLevel} onChange={e=>setForm({...form,educationLevel:e.target.value})}>
+        <select value={form.educationLevel || 'undergraduate'} onChange={handleEducationChange}>
           <option value="undergraduate">Undergraduate</option>
           <option value="graduate">Graduate</option>
-          <option value="other">Other</option>
+          <option value="mentor">Mentor</option>
         </select>
       )}
       <input placeholder="Interests (comma separated)" value={form.interests} onChange={e=>setForm({...form,interests:e.target.value})} />
