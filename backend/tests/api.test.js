@@ -128,22 +128,40 @@ test('reads the mentor availability list', async () => {
   assert.ok(res.body.length >= 1);
 });
 
-test('creates a booking for an available slot', async () => {
+test('requires a successful mock payment before creating a booking', async () => {
+  const paymentRes = await request.post('/api/bookings/mock-payment').send({
+    amount: 2500,
+    currency: 'INR'
+  });
+
+  assert.equal(paymentRes.status, 200);
+  assert.equal(paymentRes.body.paymentStatus, 'paid');
+  assert.ok(paymentRes.body.paymentReference);
+
   const res = await request.post('/api/bookings').send({
     studentId: studentUserId,
-    availabilityId: createdAvailabilityId
+    availabilityId: createdAvailabilityId,
+    paymentStatus: 'paid',
+    paymentReference: paymentRes.body.paymentReference,
+    amount: 2500,
+    currency: 'INR'
   });
 
   assert.equal(res.status, 201);
   assert.equal(res.body.studentId, studentUserId);
   assert.equal(res.body.mentorId, mentorUserId);
+  assert.equal(res.body.paymentStatus, 'paid');
   createdBookingId = res.body._id;
 });
 
 test('prevents booking an already-booked slot', async () => {
   const res = await request.post('/api/bookings').send({
     studentId: studentUserId,
-    availabilityId: createdAvailabilityId
+    availabilityId: createdAvailabilityId,
+    paymentStatus: 'paid',
+    paymentReference: 'MOCK_RETRY_TEST',
+    amount: 2500,
+    currency: 'INR'
   });
 
   assert.equal(res.status, 409);

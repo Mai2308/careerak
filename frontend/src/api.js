@@ -123,6 +123,18 @@ export async function deleteAvailability(availabilityId) {
 // BOOKINGS
 // =======================
 
+export async function createMockPayment(payload) {
+  const res = await fetch(`${API_BASE}/api/bookings/mock-payment`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  })
+
+  return parseResponse(res)
+}
+
 export async function createBooking(payload) {
   const res = await fetch(`${API_BASE}/api/bookings`, {
     method: 'POST',

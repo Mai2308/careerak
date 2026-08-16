@@ -1,5 +1,10 @@
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
+
+if (!process.env.JWT_SECRET) {
+  process.env.JWT_SECRET = 'careerak-dev-secret';
+}
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -26,10 +31,10 @@ const mentorsRoutes = require('./routes/mentors');
 app.use('/api/mentors', mentorsRoutes);
 
 const PORT = process.env.PORT || 5000;
-// If MONGO_URI looks like a placeholder (contains <username> or cluster0), fall back to local DB for dev.
-let MONGO_URI = process.env.MONGO_URI || '';
-if (MONGO_URI.includes('<') || MONGO_URI.includes('cluster0.mongodb.net')) {
-  console.warn('Detected placeholder MONGO_URI; falling back to local MongoDB for development.');
+// If MONGO_URI looks like a placeholder or is missing, fall back to local DB for dev.
+let MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/careerak';
+if (!process.env.MONGO_URI || MONGO_URI.includes('<') || MONGO_URI.includes('cluster0.mongodb.net')) {
+  console.warn('Detected placeholder or missing MONGO_URI; falling back to local MongoDB for development.');
   MONGO_URI = 'mongodb://localhost:27017/careerak';
 }
 
