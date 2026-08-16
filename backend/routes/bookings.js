@@ -7,7 +7,7 @@ const Booking = require('../models/Booking');
 router.get('/mine', auth, async (req, res) => {
   try {
     const bookings = await Booking.find({ student: req.userId })
-      .populate('mentor', 'name email')
+      .populate('mentor', 'name')
       .sort({ date: -1 });
     res.json({ bookings });
   } catch (err) {
