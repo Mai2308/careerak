@@ -54,9 +54,16 @@ async function findMentorsForFields(fieldIds) {
     date: { $gte: new Date() }
   }).sort({ date: 1 });
 
+  const sessionsByMentorId = availability.reduce((acc, a) => {
+    const key = String(a.mentor);
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(a);
+    return acc;
+  }, {});
+
   return mentors.map(mentor => ({
     ...mentor.toObject(),
-    availableSessions: availability.filter(a => String(a.mentor) === String(mentor._id))
+    availableSessions: sessionsByMentorId[String(mentor._id)] || []
   }));
 }
 
