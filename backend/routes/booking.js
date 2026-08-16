@@ -6,7 +6,7 @@ const {
   getStudentBookings,
   getMentorBookings,
   cancelBooking
-} = require('../controllers/bookingController');
+} = require('../controllers/BookingController');
 
 
 // Create a new booking

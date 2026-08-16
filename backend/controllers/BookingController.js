@@ -28,8 +28,9 @@ const createBooking = async (req, res) => {
     }
 
     const existingBooking = await Booking.findOne({
-      availabilityId
-    });
+  availabilityId,
+  status: { $in: ['pending', 'confirmed'] }
+})
 
     if (existingBooking) {
       return res.status(409).json({
