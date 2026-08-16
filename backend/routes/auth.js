@@ -3,10 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const JWT_SECRET = process.env.JWT_SECRET || 'secret';
-if (!process.env.JWT_SECRET) {
-  console.warn('Warning: JWT_SECRET is not set. Using fallback secret. Set JWT_SECRET in .env for production.');
-}
+const JWT_SECRET = process.env.JWT_SECRET;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 10;
 const authAttempts = new Map();
