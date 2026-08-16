@@ -44,7 +44,7 @@ router.get('/fields', auth, async (req, res) => {
 // Find mentors (with available sessions) teaching any of the given field ids
 async function findMentorsForFields(fieldIds) {
   const mentors = await User.find({ role: 'mentor', field: { $in: fieldIds } })
-    .select('name email rating interests educationLevel field')
+    .select('name rating interests educationLevel field')
     .populate('field');
 
   const mentorIds = mentors.map(m => m._id);
