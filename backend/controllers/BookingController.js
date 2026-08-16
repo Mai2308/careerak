@@ -1,15 +1,54 @@
 const Booking = require('../models/Booking');
 const Availability = require('../models/Availability');
 
+const createMockPayment = async (req, res) => {
+  try {
+    const { amount, currency = 'INR' } = req.body;
+
+    if (!amount || Number(amount) <= 0) {
+      return res.status(400).json({
+        message: 'A valid amount is required for mock payment'
+      });
+    }
+
+    const paymentReference = `MOCK_${Date.now()}_${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+
+    return res.status(200).json({
+      paymentStatus: 'paid',
+      paymentReference,
+      amount: Number(amount),
+      currency,
+      message: 'Mock payment completed successfully'
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Mock payment failed',
+      error: error.message
+    });
+  }
+};
 
 // CREATE a booking
 const createBooking = async (req, res) => {
   try {
-    const { studentId, availabilityId } = req.body;
+    const {
+      studentId,
+      availabilityId,
+      paymentStatus,
+      paymentReference,
+      amount,
+      currency = 'INR'
+    } = req.body;
 
     if (!studentId || !availabilityId) {
       return res.status(400).json({
         message: 'studentId and availabilityId are required'
+      });
+    }
+
+    if (paymentStatus !== 'paid' || !paymentReference) {
+      return res.status(400).json({
+        message: 'Payment must be completed before booking'
       });
     }
 
@@ -28,9 +67,9 @@ const createBooking = async (req, res) => {
     }
 
     const existingBooking = await Booking.findOne({
-  availabilityId,
-  status: { $in: ['pending', 'confirmed'] }
-})
+      availabilityId,
+      status: { $in: ['pending', 'confirmed'] }
+    });
 
     if (existingBooking) {
       return res.status(409).json({
@@ -42,7 +81,11 @@ const createBooking = async (req, res) => {
       studentId,
       mentorId: availability.mentorId,
       availabilityId,
-      status: 'pending'
+      status: 'confirmed',
+      paymentStatus,
+      paymentReference,
+      amount: Number(amount || 0),
+      currency
     });
 
     availability.status = 'booked';
@@ -151,6 +194,7 @@ const cancelBooking = async (req, res) => {
 
 
 module.exports = {
+  createMockPayment,
   createBooking,
   getStudentBookings,
   getMentorBookings,

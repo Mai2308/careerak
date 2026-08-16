@@ -2,11 +2,16 @@ const express = require('express');
 const router = express.Router();
 
 const {
+  createMockPayment,
   createBooking,
   getStudentBookings,
   getMentorBookings,
   cancelBooking
 } = require('../controllers/BookingController');
+
+
+// Mock payment before booking is created
+router.post('/mock-payment', createMockPayment);
 
 
 // Create a new booking
