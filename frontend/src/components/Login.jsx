@@ -38,8 +38,6 @@ export default function Login({ onAuth, onBack }){
     <div className="auth-page">
       <div className="auth-panel auth-copy">
         <div className="logo">
-          <span className="logo-icon">🎓</span>
-          <span>Careerak</span>
         </div>
         <h2>Welcome back</h2>
         <p>Continue building your next career move with mentors who understand your path.</p>

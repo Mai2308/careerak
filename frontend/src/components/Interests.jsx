@@ -67,7 +67,7 @@ export default function Interests({ onBack }){
   return (
     <div className="card">
       <h2>Choose Fields of Interest</h2>
-      <button onClick={onBack}>Back to Profile</button>
+      <button className="link-button inline-back" onClick={onBack}>← Back to Profile</button>
       {loading && <p>Loading fields...</p>}
       {msg && <p className="msg">{msg}</p>}
 
@@ -89,8 +89,8 @@ export default function Interests({ onBack }){
               ))}
             </div>
           ))}
-          <button onClick={confirm} disabled={saving}>{saving ? 'Saving...' : 'Confirm Interests'}</button>
-          {saved && <p style={{color:'green'}}>Your interests have been saved.</p>}
+          <button className="pill-button inline-action" onClick={confirm} disabled={saving}>{saving ? 'Saving...' : 'Confirm Interests'}</button>
+          {saved && <p className="success-message">Your interests have been saved.</p>}
         </div>
       )}
 

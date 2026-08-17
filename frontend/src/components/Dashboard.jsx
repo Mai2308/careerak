@@ -3,11 +3,13 @@ import MentorAvailability from './MentorAvailability'
 import MentorBookings from './MentorBookings'
 import AvailableSlots from './AvailableSlots'
 import StudentBookings from './StudentBookings'
-import { getMyMentor, getMentors } from '../api'
+import { getMyMentor, getMentors, getMentorReviews } from '../api'
 import MentorProfile from './MentorProfile'
 
 export default function Dashboard({ user, onViewProfile, onExplore }) {
   const [mentorProfile, setMentorProfile] = useState(null)
+  const [reviews, setReviews] = useState([])
+  const [reviewsLoading, setReviewsLoading] = useState(false)
   const [mentors, setMentors] = useState([])
   const [selectedMentorId, setSelectedMentorId] = useState('')
   const [loadingMentors, setLoadingMentors] = useState(false)
@@ -26,6 +28,12 @@ export default function Dashboard({ user, onViewProfile, onExplore }) {
         .then((m) => setMentorProfile(m))
         .catch(() => setMentorProfile(null))
         .finally(() => setLoading(false))
+
+      setReviewsLoading(true)
+      getMentorReviews(user.id)
+        .then((data) => setReviews(Array.isArray(data) ? data : []))
+        .catch(() => setReviews([]))
+        .finally(() => setReviewsLoading(false))
       return
     }
 
@@ -59,16 +67,15 @@ export default function Dashboard({ user, onViewProfile, onExplore }) {
     .sort((a, b) => sortBy === 'name' ? a.name.localeCompare(b.name) : (b.rating || 0) - (a.rating || 0))
 
   if (user.role === 'mentor') {
-    const reviews = mentorProfile?.reviews || []
+    const averageRating = mentorProfile?.rating || (reviews.length
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      : 0)
 
     return (
       <div className="mentor-dashboard">
         <header className="mentor-dashboard-header">
           <div className="brand-block">
-            <span className="logo-icon">🎓</span>
-            <span className="brand-name">Careerak</span>
           </div>
-          <button className="pill-button mentor-cta">Get started</button>
         </header>
 
         {loading ? (
@@ -121,7 +128,11 @@ export default function Dashboard({ user, onViewProfile, onExplore }) {
               <div className="surface-panel stat-panel">
                 <div className="stat-label">AVERAGE RATING</div>
                 <div className="stat-value large-rating">
-                  {mentorProfile.rating ? mentorProfile.rating.toFixed(1) : '4.9'}
+                  {averageRating ? averageRating.toFixed(1) : 'New'}
+                </div>
+                <div className="rating-summary-stars">
+                  {'★'.repeat(Math.round(averageRating)).padEnd(5, '☆')}
+                  <span className="muted rating-summary-count"> ({reviews.length} review{reviews.length === 1 ? '' : 's'})</span>
                 </div>
               </div>
             </div>
@@ -133,17 +144,28 @@ export default function Dashboard({ user, onViewProfile, onExplore }) {
               <div className="section-header-row">
                 <h3 className="panel-title light">RECENT REVIEWS</h3>
               </div>
-              <div className="review-list">
-                {reviews.map((review, index) => (
-                  <div className="review-card" key={`${review.name}-${index}`}>
-                    <div className="review-heading">
-                      <h4>{review.name}</h4>
-                      <span className="star-rating">★ {Number(review.rating || 5).toFixed(1)}</span>
+              {reviewsLoading ? (
+                <div className="booking-empty">Loading reviews...</div>
+              ) : reviews.length === 0 ? (
+                <div className="booking-empty">No reviews yet. They will appear here once students rate your sessions.</div>
+              ) : (
+                <div className="review-list">
+                  {reviews.map((review) => (
+                    <div className="review-card" key={review._id}>
+                      <div className="review-heading">
+                        <div className="review-heading-left">
+                          <div className="review-avatar">
+                            {(review.reviewerName || 'S').split(' ').map((piece) => piece[0]).slice(0, 2).join('').toUpperCase()}
+                          </div>
+                          <h4>{review.reviewerName || 'Student'}</h4>
+                        </div>
+                        <span className="star-rating">★ {Number(review.rating || 0).toFixed(1)}</span>
+                      </div>
+                      <p>{review.comment}</p>
                     </div>
-                    <p>{review.text}</p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -152,29 +174,39 @@ export default function Dashboard({ user, onViewProfile, onExplore }) {
   }
 
   return (
-    <div>
-      <div className="card">
-        <h2>Welcome, {user.name}</h2>
-        <p>Role: {user.role}</p>
-        <p>Email: {user.email}</p>
-        {onViewProfile && <button onClick={onViewProfile}>View Profile</button>}
-        {onExplore && <button className="secondary" onClick={onExplore} style={{ marginLeft: 8 }}>Explore Categories</button>}
+    <div className="student-dashboard">
+      <div className="surface-panel welcome-panel">
+        <div className="welcome-row">
+          <div>
+            <span className="eyebrow">STUDENT DASHBOARD</span>
+            <h2 className="welcome-title">Welcome back, {user.name?.split(' ')[0] || user.name}</h2>
+            <p className="muted">{user.email} · {user.role}</p>
+          </div>
+          <div className="welcome-actions">
+            {onViewProfile && <button className="secondary-button" onClick={onViewProfile}>View profile</button>}
+            {onExplore && <button className="pill-button" onClick={onExplore}>Explore categories</button>}
+          </div>
+        </div>
       </div>
 
-      <div className="card">
-        <h2>Find your mentor</h2>
-        <p className="muted">{mentors.length} mentor{mentors.length === 1 ? '' : 's'} available. Filter, compare and book in minutes.</p>
+      <div className="surface-panel mentor-search-panel">
+        <div className="section-header-row">
+          <h3 className="panel-title light">FIND YOUR MENTOR</h3>
+          <p className="muted">{mentors.length} mentor{mentors.length === 1 ? '' : 's'} available. Filter, compare and book in minutes.</p>
+        </div>
 
-        <input
-          placeholder="Search by name"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <div className="search-controls">
+          <input
+            placeholder="Search by name"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
 
-        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-          <option value="rating">Highest rated</option>
-          <option value="name">Name (A-Z)</option>
-        </select>
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+            <option value="rating">Highest rated</option>
+            <option value="name">Name (A-Z)</option>
+          </select>
+        </div>
 
         <div className="field-pills">
           <button
@@ -197,11 +229,11 @@ export default function Dashboard({ user, onViewProfile, onExplore }) {
         </div>
 
         {loadingMentors ? (
-          <p>Loading mentors...</p>
+          <p className="muted">Loading mentors...</p>
         ) : mentors.length === 0 ? (
-          <p>No mentors are available yet.</p>
+          <p className="muted">No mentors are available yet.</p>
         ) : filteredMentors.length === 0 ? (
-          <p>No mentors match your search.</p>
+          <p className="muted">No mentors match your search.</p>
         ) : (
           <div className="mentor-grid">
             {filteredMentors.map((mentor) => {

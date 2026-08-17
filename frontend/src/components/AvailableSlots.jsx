@@ -77,15 +77,15 @@ export default function AvailableSlots({ user, mentorId }) {
 
   if (!mentorId) {
     return (
-      <div className="card">
-        <p>Please select a mentor first.</p>
+      <div className="surface-panel booking-panel">
+        <p className="muted">Please select a mentor first.</p>
       </div>
     )
   }
 
   return (
-    <div className="card">
-      <h2>Available Sessions</h2>
+    <div className="surface-panel booking-panel">
+      <h3 className="panel-title light">AVAILABLE SESSIONS</h3>
 
       {error && <p className="error-message">{error}</p>}
       {message && <p className="success-message">{message}</p>}
@@ -153,25 +153,27 @@ export default function AvailableSlots({ user, mentorId }) {
           </div>
         </div>
       ) : (
-        slots.map((slot) => (
-          <div className="slot-card" key={slot._id}>
-            <div>
-              <strong>Date:</strong>{' '}
-              {new Date(slot.date).toLocaleDateString()}
+        <div className="slot-list">
+          {slots.map((slot) => (
+            <div className="slot-card" key={slot._id}>
+              <div>
+                <strong>Date:</strong>{' '}
+                {new Date(slot.date).toLocaleDateString()}
+              </div>
+
+              <div>
+                <strong>Time:</strong>{' '}
+                {slot.startTime} - {slot.endTime}
+              </div>
+
+              <div className="slot-price">₹{MOCK_SESSION_PRICE}</div>
+
+              <button onClick={() => setSelectedSlot(slot)}>
+                Select slot
+              </button>
             </div>
-
-            <div>
-              <strong>Time:</strong>{' '}
-              {slot.startTime} - {slot.endTime}
-            </div>
-
-            <div className="slot-price">₹{MOCK_SESSION_PRICE}</div>
-
-            <button onClick={() => setSelectedSlot(slot)}>
-              Select slot
-            </button>
-          </div>
-        ))
+          ))}
+        </div>
       )}
 
       <MentorReviews mentorId={mentorId} user={user} />

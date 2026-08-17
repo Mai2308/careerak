@@ -44,53 +44,48 @@ export default function StudentBookings({ user }) {
   }
 
   return (
-    <div className="card">
-      <h2>My Bookings</h2>
+    <div className="surface-panel booking-panel">
+      <h3 className="panel-title light">MY BOOKINGS</h3>
 
-      {error && <p>{error}</p>}
-      {message && <p>{message}</p>}
+      {error && <p className="msg">{error}</p>}
+      {message && <p className="success-message">{message}</p>}
 
       {loading ? (
-        <p>Loading bookings...</p>
+        <div className="booking-empty">Loading bookings...</div>
       ) : bookings.length === 0 ? (
-        <p>You have no bookings yet.</p>
+        <div className="booking-empty">You have no bookings yet.</div>
       ) : (
-        bookings.map((booking) => (
-          <div className="card" key={booking._id}>
-            <p>
-              <strong>Mentor:</strong>{' '}
-              {booking.mentorId?.name || 'Mentor'}
-            </p>
+        <div className="booking-list">
+          {bookings.map((booking) => (
+            <div className="booking-row" key={booking._id}>
+              <div className="booking-person">
+                <div className="booking-avatar">
+                  {(booking.mentorId?.name || 'M').split(' ').map((piece) => piece[0]).slice(0, 2).join('').toUpperCase()}
+                </div>
+                <div className="booking-copy">
+                  <div className="booking-name">{booking.mentorId?.name || 'Mentor'}</div>
+                  <div className="booking-subtitle">
+                    {booking.availabilityId?.startTime ? `${booking.availabilityId.startTime} - ${booking.availabilityId.endTime}` : 'Session booked'}
+                  </div>
+                </div>
+              </div>
 
-            <p>
-              <strong>Date:</strong>{' '}
-              {booking.availabilityId?.date
-                ? new Date(
-                    booking.availabilityId.date
-                  ).toLocaleDateString()
-                : 'N/A'}
-            </p>
-
-            <p>
-              <strong>Time:</strong>{' '}
-              {booking.availabilityId?.startTime} -{' '}
-              {booking.availabilityId?.endTime}
-            </p>
-
-            <p>
-              <strong>Status:</strong> {booking.status}
-            </p>
-
-            {(booking.status === 'pending' ||
-              booking.status === 'confirmed') && (
-              <button
-                onClick={() => handleCancel(booking._id)}
-              >
-                Cancel Booking
-              </button>
-            )}
-          </div>
-        ))
+              <div className="booking-time-block">
+                <div className="booking-date">
+                  {booking.availabilityId?.date
+                    ? new Date(booking.availabilityId.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+                    : 'N/A'}
+                </div>
+                <div className="booking-status">{booking.status === 'confirmed' ? 'Confirmed' : booking.status}</div>
+                {(booking.status === 'pending' || booking.status === 'confirmed') && (
+                  <button className="secondary-button compact" onClick={() => handleCancel(booking._id)}>
+                    Cancel
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   )
