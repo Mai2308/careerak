@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 import { register, createMentor } from '../api'
 
-export default function Signup({ onAuth }){
-  const [form, setForm] = useState({ name:'', email:'', password:'', confirmPassword:'', role:'student', interests:'', educationLevel:'undergraduate' })
+const FIELD_OPTIONS = ['Engineering', 'Computer Science', 'Data Analysis', 'Marketing', 'Finance', 'Business', 'Design', 'Healthcare']
+
+export default function Signup({ initialRole = 'student', onAuth, onBack }){
+  const [form, setForm] = useState({ name:'', email:'', password:'', confirmPassword:'', role:initialRole, interests: FIELD_OPTIONS[0], educationLevel:'undergraduate' })
   const [showPassword, setShowPassword] = useState(false)
   const [msg, setMsg] = useState(null)
   const [errors, setErrors] = useState([])
@@ -18,15 +20,6 @@ export default function Signup({ onAuth }){
     return errs
   }
 
-  const handleEducationChange = e => {
-    const value = e.target.value
-    if (value === 'mentor') {
-      setForm({ ...form, role: 'mentor', educationLevel: '' })
-    } else {
-      setForm({ ...form, educationLevel: value })
-    }
-  }
-
   const submit = async e => {
     e.preventDefault()
     setMsg(null)
@@ -35,7 +28,7 @@ export default function Signup({ onAuth }){
     setErrors([])
     setLoading(true)
     try{
-      const payload = { ...form, interests: form.interests.split(',').map(s=>s.trim()).filter(Boolean) }
+      const payload = { ...form, interests: form.role === 'student' ? [form.interests] : [] }
       const res = await register(payload)
       if (res.token){
         // store token immediately so subsequent API calls are authenticated
@@ -60,35 +53,92 @@ export default function Signup({ onAuth }){
   }
 
   return (
-    <form onSubmit={submit} className="card">
-      <h2>Sign up</h2>
-      {errors.length > 0 && (
-        <ul style={{color:'crimson'}}>
-          {errors.map((e,i)=>(<li key={i}>{e}</li>))}
+    <div className="auth-page">
+      <div className="auth-panel auth-copy">
+        <div className="logo">
+          <span className="logo-icon">🎓</span>
+          <span>Careerak</span>
+        </div>
+        <h2>Start your next chapter</h2>
+        <p>Join students and mentors building stronger career paths through guidance, trust and better decisions.</p>
+        <ul>
+          <li>Discover mentors in your field</li>
+          <li>Book sessions that fit your goals</li>
+          <li>Build a clearer path forward</li>
         </ul>
-      )}
-      <input placeholder="Name" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} required />
-      <input placeholder="Email" type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} required />
-      <input placeholder="Password" type={showPassword ? 'text' : 'password'} value={form.password} onChange={e=>setForm({...form,password:e.target.value})} required />
-      <input placeholder="Confirm Password" type={showPassword ? 'text' : 'password'} value={form.confirmPassword} onChange={e=>setForm({...form,confirmPassword:e.target.value})} required />
-      <label style={{ display:'flex', alignItems:'center', gap:'0.5rem', fontSize:'0.9rem', color:'#555' }}>
-        <input type="checkbox" checked={showPassword} onChange={e=>setShowPassword(e.target.checked)} />
-        Show password
-      </label>
-      <select value={form.role} onChange={e=>setForm({...form,role:e.target.value})}>
-        <option value="student">Student</option>
-        <option value="mentor">Mentor</option>
-      </select>
-      {form.role === 'student' && (
-        <select value={form.educationLevel || 'undergraduate'} onChange={handleEducationChange}>
-          <option value="undergraduate">Undergraduate</option>
-          <option value="graduate">Graduate</option>
-          <option value="mentor">Mentor</option>
-        </select>
-      )}
-      <input placeholder="Interests (comma separated)" value={form.interests} onChange={e=>setForm({...form,interests:e.target.value})} />
-      <button type="submit" disabled={loading}>{loading ? 'Creating...' : 'Create account'}</button>
-      {msg && <p className="msg" style={{color:'crimson'}}>{msg}</p>}
-    </form>
+      </div>
+
+      <form onSubmit={submit} className="card auth-card auth-form">
+        <button type="button" className="link-button inline-back" onClick={onBack}>
+          ← Back
+        </button>
+        <div className="auth-heading">
+          <span className="eyebrow">Create account</span>
+          <h2>Tell us who you are</h2>
+        </div>
+
+        <div className="role-toggle">
+          <button
+            type="button"
+            className={form.role === 'student' ? 'active' : ''}
+            onClick={()=>setForm({...form, role:'student'})}
+          >
+            🎓 Student
+          </button>
+          <button
+            type="button"
+            className={form.role === 'mentor' ? 'active' : ''}
+            onClick={()=>setForm({...form, role:'mentor'})}
+          >
+            👤 Mentor
+          </button>
+        </div>
+
+        {errors.length > 0 && (
+          <ul className="error-list">
+            {errors.map((e,i)=>(<li key={i}>{e}</li>))}
+          </ul>
+        )}
+
+        <label className="field-label">
+          Full name
+          <input placeholder="Your name" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} required />
+        </label>
+
+        <label className="field-label">
+          Email
+          <input placeholder="you@example.com" type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} required />
+        </label>
+
+        <label className="field-label">
+          Password
+          <input placeholder="At least 8 characters" type={showPassword ? 'text' : 'password'} value={form.password} onChange={e=>setForm({...form,password:e.target.value})} required />
+        </label>
+
+        <label className="field-label">
+          Confirm password
+          <input placeholder="Re-enter your password" type={showPassword ? 'text' : 'password'} value={form.confirmPassword} onChange={e=>setForm({...form,confirmPassword:e.target.value})} required />
+        </label>
+
+        <label className="checkbox-label">
+          <input type="checkbox" checked={showPassword} onChange={e=>setShowPassword(e.target.checked)} />
+          Show password
+        </label>
+
+        {form.role === 'student' && (
+          <label className="field-label">
+            Field of interest
+            <select value={form.interests} onChange={e=>setForm({...form,interests:e.target.value})}>
+              {FIELD_OPTIONS.map(f => <option key={f} value={f}>{f}</option>)}
+            </select>
+          </label>
+        )}
+
+        <button type="submit" className="pill-button full-width" disabled={loading}>
+          {loading ? 'Creating...' : 'Create account & see mentors'}
+        </button>
+        {msg && <p className="msg">{msg}</p>}
+      </form>
+    </div>
   )
 }

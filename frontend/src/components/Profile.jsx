@@ -33,7 +33,7 @@ export default function Profile({ user, onBack }){
       <h2>My Profile</h2>
       <button onClick={onBack}>Back to Dashboard</button>
       {loading && <p>Loading profile...</p>}
-      {msg && <p className="msg" style={{color:'crimson'}}>{msg}</p>}
+      {msg && <p className="msg">{msg}</p>}
       {!loading && profile && (
         <div>
           <p><strong>Name:</strong> {profile.name}</p>

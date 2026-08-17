@@ -27,48 +27,42 @@ export default function MentorBookings({ user }) {
   }, [user.id])
 
   return (
-    <div className="card">
-      <h2>Bookings with Me</h2>
+    <div className="surface-panel booking-panel">
+      <h3 className="panel-title light">UPCOMING BOOKINGS</h3>
 
-      {error && <p>{error}</p>}
+      {error && <p className="msg">{error}</p>}
 
       {loading ? (
-        <p>Loading bookings...</p>
+        <div className="booking-empty">Loading bookings...</div>
       ) : bookings.length === 0 ? (
-        <p>You have no bookings yet.</p>
+        <div className="booking-empty">No bookings yet.</div>
       ) : (
-        bookings.map((booking) => (
-          <div className="card" key={booking._id}>
-            <p>
-              <strong>Student:</strong>{' '}
-              {booking.studentId?.name || 'Student'}
-            </p>
+        <div className="booking-list">
+          {bookings.map((booking) => (
+            <div className="booking-row" key={booking._id}>
+              <div className="booking-person">
+                <div className="booking-avatar">
+                  {(booking.studentId?.name || 'S').split(' ').map((piece) => piece[0]).slice(0,2).join('').toUpperCase()}
+                </div>
+                <div className="booking-copy">
+                  <div className="booking-name">{booking.studentId?.name || 'Student'}</div>
+                  <div className="booking-subtitle">{booking.availabilityId?.startTime ? `${booking.availabilityId.startTime} - ${booking.availabilityId.endTime}` : 'Session booked'}</div>
+                </div>
+              </div>
 
-            <p>
-              <strong>Email:</strong>{' '}
-              {booking.studentId?.email || 'N/A'}
-            </p>
-
-            <p>
-              <strong>Date:</strong>{' '}
-              {booking.availabilityId?.date
-                ? new Date(
-                    booking.availabilityId.date
-                  ).toLocaleDateString()
-                : 'N/A'}
-            </p>
-
-            <p>
-              <strong>Time:</strong>{' '}
-              {booking.availabilityId?.startTime} -{' '}
-              {booking.availabilityId?.endTime}
-            </p>
-
-            <p>
-              <strong>Status:</strong> {booking.status}
-            </p>
-          </div>
-        ))
+              <div className="booking-time-block">
+                <div className="booking-date">
+                  {booking.availabilityId?.date
+                    ? new Date(booking.availabilityId.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+                    : 'TBD'}
+                  {' · '}
+                  {booking.availabilityId?.startTime || '00:00'}
+                </div>
+                <div className="booking-status">{booking.status === 'confirmed' ? 'Confirmed' : booking.status}</div>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   )

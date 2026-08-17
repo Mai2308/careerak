@@ -78,32 +78,44 @@ export default function MentorAvailability({ user }) {
   }
 
   return (
-    <div className="card">
-      <h2>Manage Availability</h2>
+    <div className="surface-panel availability-panel">
+      <h3 className="panel-title light">AVAILABILITY</h3>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Date</label>
+      <div className="availability-list">
+        {slots.length === 0 ? (
+          <div className="availability-empty">No availability slots yet.</div>
+        ) : (
+          slots.map((slot) => (
+            <div className="availability-row" key={slot._id}>
+              <span>
+                {new Date(slot.date).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}
+                {' · '}
+                {slot.startTime} - {slot.endTime}
+              </span>
+              {slot.status === 'available' && (
+                <button type="button" className="remove-slot" onClick={() => handleDelete(slot._id)} aria-label="Delete slot">
+                  ×
+                </button>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+
+      <form onSubmit={handleSubmit} className="availability-form">
+        <div className="time-row">
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
             required
           />
-        </div>
-
-        <div>
-          <label>Start Time</label>
           <input
             type="time"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
             required
           />
-        </div>
-
-        <div>
-          <label>End Time</label>
           <input
             type="time"
             value={endTime}
@@ -112,43 +124,11 @@ export default function MentorAvailability({ user }) {
           />
         </div>
 
-        <button type="submit">
-          Add Availability
-        </button>
+        <button type="submit" className="secondary-button add-slot-button">+ Add slot</button>
       </form>
 
-      {error && <p>{error}</p>}
-      {message && <p>{message}</p>}
-
-      <h3>Your Availability</h3>
-
-      {slots.length === 0 ? (
-        <p>No availability slots yet.</p>
-      ) : (
-        slots.map((slot) => (
-          <div className="card" key={slot._id}>
-            <p>
-              <strong>Date:</strong>{' '}
-              {new Date(slot.date).toLocaleDateString()}
-            </p>
-
-            <p>
-              <strong>Time:</strong>{' '}
-              {slot.startTime} - {slot.endTime}
-            </p>
-
-            <p>
-              <strong>Status:</strong> {slot.status}
-            </p>
-
-            {slot.status === 'available' && (
-              <button onClick={() => handleDelete(slot._id)}>
-                Delete
-              </button>
-            )}
-          </div>
-        ))
-      )}
+      {error && <p className="msg">{error}</p>}
+      {message && <p className="success-message">{message}</p>}
     </div>
   )
 }

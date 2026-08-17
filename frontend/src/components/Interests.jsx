@@ -69,7 +69,7 @@ export default function Interests({ onBack }){
       <h2>Choose Fields of Interest</h2>
       <button onClick={onBack}>Back to Profile</button>
       {loading && <p>Loading fields...</p>}
-      {msg && <p className="msg" style={{color:'crimson'}}>{msg}</p>}
+      {msg && <p className="msg">{msg}</p>}
 
       {!loading && (
         <div>
