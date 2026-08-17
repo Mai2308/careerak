@@ -1,33 +1,53 @@
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
+
+if (!process.env.JWT_SECRET) {
+  process.env.JWT_SECRET = 'careerak-dev-secret';
+}
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const dotenv = require('dotenv');
-
-dotenv.config();
-
-const mentorRoutes = require('./routes/ratings');
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');
+const exploreRoutes = require('./routes/explore');
+const availabilityRoutes = require('./routes/availability');
+const bookingRoutes = require('./routes/booking');
+const mentorsRoutes = require('./routes/mentors');
+const ratingsRoutes = require('./routes/ratings');
 
 const app = express();
-app.use(cors());
+const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000')
+  .split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean);
+
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/careerak', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-  .then(() => console.log('MongoDB connected'))
-  .catch((error) => {
-    console.error('MongoDB connection error:', error.message);
-    process.exit(1);
-  });
-
-app.use('/api/mentors', mentorRoutes);
-
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Careerak rating backend is running.' });
-});
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/explore', exploreRoutes);
+app.use('/api/availability', availabilityRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/api/mentors', mentorsRoutes);
+app.use('/api/mentors', ratingsRoutes);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+let MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/careerak';
+if (!process.env.MONGO_URI || MONGO_URI.includes('<') || MONGO_URI.includes('cluster0.mongodb.net')) {
+  console.warn('Detected placeholder or missing MONGO_URI; falling back to local MongoDB for development.');
+  MONGO_URI = 'mongodb://localhost:27017/careerak';
+}
+
+mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => {
+    console.error('Mongo connection error', err);
+  });
+
+if (require.main === module) {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+module.exports = app;
