@@ -4,6 +4,7 @@ import {
   createMockPayment,
   createBooking
 } from '../api'
+import MentorReviews from './MentorReviews'
 
 const MOCK_SESSION_PRICE = 2500
 
@@ -172,6 +173,8 @@ export default function AvailableSlots({ user, mentorId }) {
           </div>
         ))
       )}
+
+      <MentorReviews mentorId={mentorId} user={user} />
     </div>
   )
 }
