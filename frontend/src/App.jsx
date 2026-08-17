@@ -6,7 +6,7 @@ import Dashboard from './components/Dashboard'
 import Profile from './components/Profile'
 import Explore from './components/Explore'
 
-export default function App(){
+export default function App() {
   const [view, setView] = useState('landing')
   const [signupRole, setSignupRole] = useState('student')
   const [user, setUser] = useState(null)
@@ -19,24 +19,26 @@ export default function App(){
     }
   })
 
-  useEffect(()=>{
+  useEffect(() => {
     document.body.classList.toggle('dark-mode', darkMode)
     try {
       localStorage.setItem('careerak-theme', darkMode ? 'dark' : 'light')
     } catch {}
   }, [darkMode])
 
-  useEffect(()=>{
+  useEffect(() => {
     // restore user from sessionStorage if present
-    try{
+    try {
       const token = sessionStorage.getItem('token')
       const userJson = sessionStorage.getItem('user')
-      if (token && userJson){
+      if (token && userJson) {
         setUser(JSON.parse(userJson))
         setView('dashboard')
       }
-    }catch(e){/* ignore */}
-  },[])
+    } catch (e) {
+      /* ignore */
+    }
+  }, [])
 
   const handleAuth = ({ token, user }) => {
     sessionStorage.setItem('token', token)
@@ -45,7 +47,7 @@ export default function App(){
     setView('dashboard')
   }
 
-  const handleLogout = ()=>{
+  const handleLogout = () => {
     sessionStorage.removeItem('token')
     sessionStorage.removeItem('user')
     setUser(null)
@@ -60,10 +62,10 @@ export default function App(){
   if (!user && view === 'landing') {
     return (
       <Landing
-        onGetStarted={()=>goToSignup('student')}
-        onFindMentor={()=>goToSignup('student')}
-        onJoinAsMentor={()=>goToSignup('mentor')}
-        onLogin={()=>setView('login')}
+        onGetStarted={() => goToSignup('student')}
+        onFindMentor={() => goToSignup('student')}
+        onJoinAsMentor={() => goToSignup('mentor')}
+        onLogin={() => setView('login')}
       />
     )
   }
@@ -76,14 +78,17 @@ export default function App(){
         <header className={user ? 'app-header' : 'minimal-header'}>
           {user ? (
             <>
-              <div className="brand-mark">
-                <span className="logo-icon small">🎓</span>
-                <h1>Careerak</h1>
+              <div className="brand-mark" onClick={() => setView('dashboard')} style={{ cursor: 'pointer' }}>
+                <img src="/logo.png" alt="Careerak Logo" className="logo-image" />
               </div>
               <nav>
-                <button className="link-button" onClick={()=>setView('dashboard')}>Dashboard</button>
-                <button className="link-button" onClick={()=>setView('profile')}>Profile</button>
-                <button type="button" className="theme-toggle" onClick={()=>setDarkMode(!darkMode)}>
+                <button className="link-button" onClick={() => setView('dashboard')}>
+                  Dashboard
+                </button>
+                <button className="link-button" onClick={() => setView('profile')}>
+                  Profile
+                </button>
+                <button type="button" className="theme-toggle" onClick={() => setDarkMode(!darkMode)}>
                   {darkMode ? '☀️ Light' : '🌙 Dark'}
                 </button>
                 <button onClick={handleLogout}>Log out</button>
@@ -91,15 +96,21 @@ export default function App(){
             </>
           ) : (
             <>
-              <div className="brand-mark">
-                <span className="logo-icon small">🎓</span>
-                <span>Careerak</span>
+              <div className="brand-mark" onClick={() => setView('landing')} style={{ cursor: 'pointer' }}>
+                <img src="/logo.png" alt="Careerak Logo" className="logo-image" />
+                <span className="logo-text">Careerak</span>
               </div>
               <nav>
-                <button className="link-button" onClick={()=>setView('landing')}>Home</button>
-                <button className="link-button" onClick={()=>setView('signup')}>Sign up</button>
-                <button className="link-button" onClick={()=>setView('login')}>Log in</button>
-                <button type="button" className="theme-toggle" onClick={()=>setDarkMode(!darkMode)}>
+                <button className="link-button" onClick={() => setView('landing')}>
+                  Home
+                </button>
+                <button className="link-button" onClick={() => setView('signup')}>
+                  Sign up
+                </button>
+                <button className="link-button" onClick={() => setView('login')}>
+                  Log in
+                </button>
+                <button type="button" className="theme-toggle" onClick={() => setDarkMode(!darkMode)}>
                   {darkMode ? '☀️ Light' : '🌙 Dark'}
                 </button>
               </nav>
@@ -111,18 +122,16 @@ export default function App(){
       <main className={user ? 'app-main' : 'full-width-main'}>
         {user ? (
           view === 'profile' ? (
-            <Profile user={user} onBack={()=>setView('dashboard')} />
+            <Profile user={user} onBack={() => setView('dashboard')} />
           ) : view === 'explore' ? (
-            <Explore onBack={()=>setView('dashboard')} />
+            <Explore onBack={() => setView('dashboard')} />
           ) : (
-            <Dashboard user={user} onViewProfile={()=>setView('profile')} onExplore={()=>setView('explore')} />
+            <Dashboard user={user} onViewProfile={() => setView('profile')} onExplore={() => setView('explore')} />
           )
+        ) : view === 'signup' ? (
+          <Signup initialRole={signupRole} onAuth={handleAuth} onBack={() => setView('landing')} />
         ) : (
-          view === 'signup' ? (
-            <Signup initialRole={signupRole} onAuth={handleAuth} onBack={()=>setView('landing')} />
-          ) : (
-            <Login onAuth={handleAuth} onBack={()=>setView('landing')} />
-          )
+          <Login onAuth={handleAuth} onBack={() => setView('landing')} />
         )}
       </main>
     </div>

@@ -55,10 +55,7 @@ export default function Signup({ initialRole = 'student', onAuth, onBack }){
   return (
     <div className="auth-page">
       <div className="auth-panel auth-copy">
-        <div className="logo">
-          <span className="logo-icon">🎓</span>
-          <span>Careerak</span>
-        </div>
+        
         <h2>Start your next chapter</h2>
         <p>Join students and mentors building stronger career paths through guidance, trust and better decisions.</p>
         <ul>

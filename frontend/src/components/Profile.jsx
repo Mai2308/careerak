@@ -31,7 +31,7 @@ export default function Profile({ user, onBack }){
   return (
     <div className="card">
       <h2>My Profile</h2>
-      <button onClick={onBack}>Back to Dashboard</button>
+      <button className="link-button inline-back" onClick={onBack}>← Back to Dashboard</button>
       {loading && <p>Loading profile...</p>}
       {msg && <p className="msg">{msg}</p>}
       {!loading && profile && (
@@ -44,7 +44,7 @@ export default function Profile({ user, onBack }){
             <p><strong>Interests:</strong> {profile.interests.join(', ')}</p>
           )}
           {profile.role === 'student' && (
-            <button onClick={()=>setShowInterests(true)}>Choose Fields of Interest</button>
+            <button className="pill-button inline-action" onClick={()=>setShowInterests(true)}>Choose Fields of Interest</button>
           )}
         </div>
       )}
