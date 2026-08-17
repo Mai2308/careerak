@@ -79,7 +79,7 @@ export default function Explore({ onBack }){
     <div className="card">
       <h2>Explore Categories</h2>
       <button onClick={onBack}>Back to Dashboard</button>
-      {msg && <p className="msg" style={{color:'crimson'}}>{msg}</p>}
+      {msg && <p className="msg">{msg}</p>}
       {loading && <p>Loading...</p>}
 
       {!loading && step === 'categories' && (

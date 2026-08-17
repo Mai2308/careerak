@@ -1,8 +1,43 @@
 :root {
   color-scheme: light;
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #eef2ff;
-  color: #111827;
+
+  /* Emerald + blue palette */
+  --emerald-50: #ecfdf5;
+  --emerald-100: #d1fae5;
+  --emerald-200: #a7f3d0;
+  --emerald-400: #34d399;
+  --emerald-500: #10b981;
+  --emerald-600: #059669;
+  --emerald-700: #047857;
+
+  --blue-50: #eff6ff;
+  --blue-100: #dbeafe;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;
+
+  --slate-50: #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-400: #94a3b8;
+  --slate-500: #64748b;
+  --slate-600: #475569;
+  --slate-800: #1e293b;
+  --slate-900: #0f172a;
+
+  --rose-50: #fef2f2;
+  --rose-200: #fecaca;
+  --rose-600: #dc2626;
+  --rose-700: #b91c1c;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --shadow-card: 0 10px 30px rgba(4, 120, 87, 0.08), 0 2px 8px rgba(15, 23, 42, 0.06);
+
+  background: var(--slate-50);
+  color: var(--slate-900);
 }
 
 * {
@@ -18,4 +53,11 @@ body,
 
 body {
   margin: 0;
+  background: linear-gradient(180deg, var(--emerald-50) 0%, var(--slate-50) 45%, var(--blue-50) 100%);
+  background-attachment: fixed;
+}
+
+::selection {
+  background: var(--emerald-200);
+  color: var(--slate-900);
 }
