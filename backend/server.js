@@ -14,6 +14,7 @@ const exploreRoutes = require('./routes/explore');
 const availabilityRoutes = require('./routes/availability');
 const bookingRoutes = require('./routes/booking');
 const mentorsRoutes = require('./routes/mentors');
+const ratingsRoutes = require('./routes/ratings');
 
 const app = express();
 const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000')
@@ -30,9 +31,9 @@ app.use('/api/explore', exploreRoutes);
 app.use('/api/availability', availabilityRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/mentors', mentorsRoutes);
+app.use('/api/mentors', ratingsRoutes);
 
 const PORT = process.env.PORT || 5000;
-// If MONGO_URI looks like a placeholder or is missing, fall back to local DB for dev.
 let MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/careerak';
 if (!process.env.MONGO_URI || MONGO_URI.includes('<') || MONGO_URI.includes('cluster0.mongodb.net')) {
   console.warn('Detected placeholder or missing MONGO_URI; falling back to local MongoDB for development.');
