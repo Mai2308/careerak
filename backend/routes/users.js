@@ -4,6 +4,27 @@ const auth = require('../middleware/auth');
 const User = require('../models/User');
 const Field = require('../models/Field');
 
+// Get all mentors (public)
+router.get('/mentors', async (req, res) => {
+  try {
+    const mentors = await User.find({ role: 'mentor' })
+      .select('name interests educationLevel rating')
+      .sort({ name: 1 })
+      .lean();
+
+    res.status(200).json(mentors.map((mentor) => ({
+      id: mentor._id,
+      _id: mentor._id,
+      name: mentor.name,
+      interests: mentor.interests || [],
+      educationLevel: mentor.educationLevel || 'undergraduate',
+      rating: mentor.rating || 0
+    })));
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to get mentors', error: error.message });
+  }
+});
+
 // Get the logged-in user's profile
 router.get('/me', auth, async (req, res) => {
   try {

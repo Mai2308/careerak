@@ -9,7 +9,7 @@ async function list(){
     await mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     const users = await User.find().sort({ createdAt: -1 }).limit(50).lean()
     console.log('Found', users.length, 'users')
-    users.forEach(u => console.log(u.email, '-', u.name, '-', u.role, '-', u.educationLevel || 'n/a'))
+    users.forEach(u => console.log(u._id.toString(), '-', u.email, '-', u.name, '-', u.role))
   }catch(err){
     console.error('Error listing users:', err.message)
   }finally{
