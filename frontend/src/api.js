@@ -76,6 +76,20 @@ export async function getMentorById(id) {
   return parseResponse(res)
 }
 
+export async function getMentorReviews(mentorId) {
+  const res = await fetch(`${API_BASE}/api/mentors/${mentorId}/reviews`)
+  return parseResponse(res)
+}
+
+export async function submitMentorReview(mentorId, payload) {
+  const res = await fetch(`${API_BASE}/api/mentors/${mentorId}/reviews`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(payload)
+  })
+  return parseResponse(res)
+}
+
 // =======================
 // USER PROFILE & INTERESTS
 // =======================

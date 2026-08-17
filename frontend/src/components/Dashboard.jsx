@@ -76,6 +76,12 @@ export default function Dashboard({ user, onViewProfile, onExplore }) {
               <p><strong>Title:</strong> {mentorProfile.title || '—'}</p>
               <p><strong>Bio:</strong> {mentorProfile.bio || '—'}</p>
               <p><strong>Skills:</strong> {mentorProfile.skills?.join(', ') || '—'}</p>
+              <p>
+                <strong>Rating:</strong>{' '}
+                {mentorProfile.reviewCount
+                  ? `${mentorProfile.rating.toFixed(1)} / 5 (${mentorProfile.reviewCount} review${mentorProfile.reviewCount === 1 ? '' : 's'})`
+                  : 'No reviews yet'}
+              </p>
               <div style={{ marginTop: 12 }}>
                 <button className="secondary" onClick={() => setEditing(!editing)}>
                   {editing ? 'Close editor' : 'Edit profile'}

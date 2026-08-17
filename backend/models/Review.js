@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const ReviewSchema = new mongoose.Schema({
   mentorId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Mentor',
+    ref: 'User',
     required: true
   },
   reviewerName: { type: String, required: true },
@@ -13,8 +13,8 @@ const ReviewSchema = new mongoose.Schema({
 });
 
 ReviewSchema.post('save', async function () {
-  const Mentor = require('./Mentor');
-  await Mentor.calculateRating(this.mentorId);
+  const User = require('./User');
+  await User.recalculateRating(this.mentorId);
 });
 
 module.exports = mongoose.model('Review', ReviewSchema);
