@@ -28,7 +28,9 @@ body.dark-mode .availability-row,
 body.dark-mode .review-card,
 body.dark-mode .auth-panel,
 body.dark-mode .auth-card,
-body.dark-mode .mini-card {
+body.dark-mode .mini-card,
+body.dark-mode .app-header,
+body.dark-mode .minimal-header {
   background: rgba(15, 23, 42, 0.92);
   border-color: rgba(148, 163, 184, 0.22);
   color: var(--slate-900);
@@ -161,21 +163,21 @@ body.dark-mode .theme-toggle {
 .minimal-header{
   display:flex;justify-content:space-between;align-items:center;gap:16px;
   margin-bottom:28px;padding:18px 24px;border-radius:var(--radius-lg);
-  background:linear-gradient(135deg,var(--emerald-600),var(--blue-600));
-  color:#fff;box-shadow:var(--shadow-card);
+  background:rgba(255,255,255,0.92);color:var(--slate-900);
+  border:1px solid rgba(148,163,184,0.18);box-shadow:0 4px 24px rgba(15,23,42,0.06);
+  backdrop-filter:blur(8px);
 }
-.minimal-header{background:rgba(255,255,255,0.7);color:var(--slate-900);border:1px solid rgba(148,163,184,0.2)}
-.brand-mark{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem}
-.app-header h1{margin:0;font-size:1.5rem;font-weight:700;letter-spacing:-0.01em}
+.brand-mark{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem;color:#111827}
+.app-header h1{margin:0;font-size:1.5rem;font-weight:800;letter-spacing:-0.01em;color:#111827}
 nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 nav button{
-  background:var(--emerald-800, #065f46);
-  color:#fff;border:1px solid var(--emerald-900, #064e3b);border-radius:999px;padding:12px 20px;font-weight:800;
-  box-shadow:0 10px 18px rgba(6, 78, 59, 0.28);
+  background:var(--emerald-600);
+  color:#fff;border:1px solid var(--emerald-700);border-radius:999px;padding:10px 18px;font-weight:700;
+  box-shadow:0 4px 12px rgba(16, 185, 129, 0.2);
 }
-.minimal-header nav button{background:var(--emerald-800, #065f46);color:#fff;border:1px solid var(--emerald-900, #064e3b)}
-nav button:hover{background:var(--emerald-900, #064e3b);color:#fff}
-.minimal-header nav button:hover{background:var(--emerald-900, #064e3b);color:#fff}
+.minimal-header nav button{background:var(--emerald-600);color:#fff;border:1px solid var(--emerald-700)}
+nav button:hover{background:var(--emerald-700);color:#fff}
+.minimal-header nav button:hover{background:var(--emerald-700);color:#fff}
 
 .card{
   background:#fff;padding:24px;border-radius:var(--radius-lg);box-shadow:var(--shadow-card);
@@ -482,4 +484,57 @@ body.dark-mode .link-button{color:#fff}
   .profile-name-row{flex-direction:column;align-items:flex-start}
   .stats-grid{grid-template-columns:1fr}
   .review-heading{flex-direction:column;align-items:flex-start}
+}
+
+/* ===== Student dashboard ===== */
+.student-dashboard{display:flex;flex-direction:column;gap:22px}
+
+.section-header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+
+.student-header-actions{display:flex;gap:8px}
+
+.mentor-filter-row{display:grid;grid-template-columns:1fr auto;gap:12px;margin-bottom:16px}
+.mentor-search-input{border-radius:999px;padding:12px 18px;border:1px solid var(--slate-200);background:#fff;color:var(--slate-900);font-size:0.95rem;font-family:inherit}
+.mentor-search-input:focus{outline:none;border-color:var(--emerald-500);box-shadow:0 0 0 4px rgba(16,185,129,0.15)}
+.mentor-sort-select{border-radius:999px;padding:12px 18px;border:1px solid var(--slate-200);background:#fff;color:var(--slate-900);font-size:0.95rem;font-family:inherit}
+.mentor-sort-select:focus{outline:none;border-color:var(--emerald-500);box-shadow:0 0 0 4px rgba(16,185,129,0.15)}
+
+.mentor-card-avatar{
+  width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--emerald-100),var(--blue-100));color:var(--slate-800);
+  font-weight:800;font-size:0.85rem;margin-bottom:4px;
+}
+
+.book-slot-btn{
+  background:linear-gradient(135deg,var(--emerald-600),var(--blue-600));color:#fff;
+  border:none;border-radius:999px;padding:10px 20px;font-weight:700;font-size:0.9rem;
+  white-space:nowrap;flex-shrink:0;
+}
+.book-slot-btn:hover{background:linear-gradient(135deg,var(--emerald-700),var(--blue-700))}
+
+.cancel-booking-btn{
+  background:var(--rose-50);color:var(--rose-700);border:1px solid var(--rose-200);
+  border-radius:999px;padding:10px 18px;font-weight:700;font-size:0.88rem;white-space:nowrap;flex-shrink:0;
+}
+.cancel-booking-btn:hover{background:var(--rose-200)}
+
+.status-pending{color:var(--blue-600)}
+.status-confirmed{color:var(--emerald-700)}
+.status-cancelled{color:var(--slate-500)}
+.status-completed{color:var(--slate-700)}
+
+@media (max-width: 700px) {
+  .mentor-filter-row{grid-template-columns:1fr}
+  .student-header-actions{flex-wrap:wrap}
+}
+
+body.dark-mode .mentor-search-input,
+body.dark-mode .mentor-sort-select{
+  background:rgba(15,23,42,0.9);color:#f8fafc;border-color:rgba(148,163,184,0.28);
+}
+body.dark-mode .cancel-booking-btn{
+  background:rgba(220,38,38,0.12);color:#fca5a5;border-color:rgba(220,38,38,0.25);
+}
+body.dark-mode .mentor-card-avatar{
+  background:linear-gradient(135deg,var(--emerald-200),var(--blue-100));
 }

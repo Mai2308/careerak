@@ -151,30 +151,51 @@ export default function Dashboard({ user, onViewProfile, onExplore }) {
     )
   }
 
+  const initials = user.name?.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase() || 'S'
+
   return (
-    <div>
-      <div className="card">
-        <h2>Welcome, {user.name}</h2>
-        <p>Role: {user.role}</p>
-        <p>Email: {user.email}</p>
-        {onViewProfile && <button onClick={onViewProfile}>View Profile</button>}
-        {onExplore && <button className="secondary" onClick={onExplore} style={{ marginLeft: 8 }}>Explore Categories</button>}
+    <div className="student-dashboard">
+
+      <div className="surface-panel profile-summary-panel">
+        <div className="profile-topline">
+          <div className="profile-avatar">{initials}</div>
+          <div className="profile-meta">
+            <div className="profile-name-row">
+              <h2>Welcome back, {user.name}</h2>
+              <div className="student-header-actions">
+                {onViewProfile && (
+                  <button className="secondary-button compact" onClick={onViewProfile}>My Profile</button>
+                )}
+                {onExplore && (
+                  <button className="secondary-button compact" onClick={onExplore}>Explore</button>
+                )}
+              </div>
+            </div>
+            <p className="profile-title">{user.email}</p>
+          </div>
+        </div>
       </div>
 
-      <div className="card">
-        <h2>Find your mentor</h2>
-        <p className="muted">{mentors.length} mentor{mentors.length === 1 ? '' : 's'} available. Filter, compare and book in minutes.</p>
+      <div className="surface-panel">
+        <div className="section-header-row">
+          <h3 className="panel-title light">FIND YOUR MENTOR</h3>
+          <span className="muted" style={{ fontSize: '0.9rem' }}>
+            {mentors.length} mentor{mentors.length === 1 ? '' : 's'} available
+          </span>
+        </div>
 
-        <input
-          placeholder="Search by name"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-
-        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-          <option value="rating">Highest rated</option>
-          <option value="name">Name (A-Z)</option>
-        </select>
+        <div className="mentor-filter-row">
+          <input
+            className="mentor-search-input"
+            placeholder="Search by name…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <select className="mentor-sort-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+            <option value="rating">Highest rated</option>
+            <option value="name">Name (A–Z)</option>
+          </select>
+        </div>
 
         <div className="field-pills">
           <button
@@ -197,11 +218,11 @@ export default function Dashboard({ user, onViewProfile, onExplore }) {
         </div>
 
         {loadingMentors ? (
-          <p>Loading mentors...</p>
+          <p className="booking-empty">Loading mentors…</p>
         ) : mentors.length === 0 ? (
-          <p>No mentors are available yet.</p>
+          <p className="booking-empty">No mentors are available yet.</p>
         ) : filteredMentors.length === 0 ? (
-          <p>No mentors match your search.</p>
+          <p className="booking-empty">No mentors match your search.</p>
         ) : (
           <div className="mentor-grid">
             {filteredMentors.map((mentor) => {
@@ -213,10 +234,13 @@ export default function Dashboard({ user, onViewProfile, onExplore }) {
                   className={`mentor-card${selectedMentorId === id ? ' active' : ''}`}
                   onClick={() => setSelectedMentorId(id)}
                 >
+                  <div className="mentor-card-avatar">
+                    {mentor.name?.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase() || 'M'}
+                  </div>
                   <strong>{mentor.name}</strong>
-                  <span className="mentor-rating">⭐ {mentor.rating ? mentor.rating.toFixed(1) : 'New'}</span>
+                  <span className="mentor-rating">★ {mentor.rating ? mentor.rating.toFixed(1) : 'New'}</span>
                   {mentor.interests?.length > 0 && (
-                    <span className="muted">{mentor.interests.join(', ')}</span>
+                    <span className="muted" style={{ fontSize: '0.82rem' }}>{mentor.interests.join(', ')}</span>
                   )}
                 </button>
               )

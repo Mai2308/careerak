@@ -44,53 +44,51 @@ export default function StudentBookings({ user }) {
   }
 
   return (
-    <div className="card">
-      <h2>My Bookings</h2>
+    <div className="surface-panel booking-panel">
+      <div className="section-header-row">
+        <h3 className="panel-title light">MY BOOKINGS</h3>
+      </div>
 
-      {error && <p>{error}</p>}
-      {message && <p>{message}</p>}
+      {error && <p className="error-message">{error}</p>}
+      {message && <p className="success-message">{message}</p>}
 
       {loading ? (
-        <p>Loading bookings...</p>
+        <p className="booking-empty">Loading bookings…</p>
       ) : bookings.length === 0 ? (
-        <p>You have no bookings yet.</p>
+        <p className="booking-empty">You have no bookings yet.</p>
       ) : (
-        bookings.map((booking) => (
-          <div className="card" key={booking._id}>
-            <p>
-              <strong>Mentor:</strong>{' '}
-              {booking.mentorId?.name || 'Mentor'}
-            </p>
-
-            <p>
-              <strong>Date:</strong>{' '}
-              {booking.availabilityId?.date
-                ? new Date(
-                    booking.availabilityId.date
-                  ).toLocaleDateString()
-                : 'N/A'}
-            </p>
-
-            <p>
-              <strong>Time:</strong>{' '}
-              {booking.availabilityId?.startTime} -{' '}
-              {booking.availabilityId?.endTime}
-            </p>
-
-            <p>
-              <strong>Status:</strong> {booking.status}
-            </p>
-
-            {(booking.status === 'pending' ||
-              booking.status === 'confirmed') && (
-              <button
-                onClick={() => handleCancel(booking._id)}
-              >
-                Cancel Booking
-              </button>
-            )}
-          </div>
-        ))
+        <div className="booking-list">
+          {bookings.map((booking) => {
+            const initials = booking.mentorId?.name
+              ?.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase() || 'M'
+            const date = booking.availabilityId?.date
+              ? new Date(booking.availabilityId.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
+              : 'N/A'
+            const time = booking.availabilityId?.startTime && booking.availabilityId?.endTime
+              ? `${booking.availabilityId.startTime} – ${booking.availabilityId.endTime}`
+              : ''
+            return (
+              <div className="booking-row" key={booking._id}>
+                <div className="booking-person">
+                  <div className="booking-avatar">{initials}</div>
+                  <div className="booking-copy">
+                    <span className="booking-name">{booking.mentorId?.name || 'Mentor'}</span>
+                    <span className="booking-subtitle">{time}</span>
+                  </div>
+                </div>
+                <div className="booking-time-block">
+                  <span className="booking-date">{date}</span>
+                  <span className={`booking-status status-${booking.status}`}>{booking.status}</span>
+                </div>
+                {(booking.status === 'pending' || booking.status === 'confirmed') && (
+                  <button className="cancel-booking-btn" onClick={() => handleCancel(booking._id)}>
+                    Cancel
+                  </button>
+                )}
+              </div>
+            )
+          })}
+        </div>
       )}
     </div>
   )

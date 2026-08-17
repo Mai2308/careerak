@@ -77,23 +77,25 @@ export default function AvailableSlots({ user, mentorId }) {
 
   if (!mentorId) {
     return (
-      <div className="card">
-        <p>Please select a mentor first.</p>
+      <div className="surface-panel">
+        <p className="booking-empty">Please select a mentor first.</p>
       </div>
     )
   }
 
   return (
-    <div className="card">
-      <h2>Available Sessions</h2>
+    <div className="surface-panel booking-panel">
+      <div className="section-header-row">
+        <h3 className="panel-title light">AVAILABLE SESSIONS</h3>
+      </div>
 
       {error && <p className="error-message">{error}</p>}
       {message && <p className="success-message">{message}</p>}
 
       {loading ? (
-        <p>Loading available sessions...</p>
+        <p className="booking-empty">Loading available sessions…</p>
       ) : slots.length === 0 ? (
-        <p>No available sessions for this mentor.</p>
+        <p className="booking-empty">No available sessions for this mentor.</p>
       ) : selectedSlot ? (
         <div className="checkout-panel">
           <div className="checkout-header">
@@ -153,25 +155,29 @@ export default function AvailableSlots({ user, mentorId }) {
           </div>
         </div>
       ) : (
-        slots.map((slot) => (
-          <div className="slot-card" key={slot._id}>
-            <div>
-              <strong>Date:</strong>{' '}
-              {new Date(slot.date).toLocaleDateString()}
+        <div className="booking-list">
+          {slots.map((slot) => (
+            <div className="booking-row" key={slot._id}>
+              <div className="booking-person">
+                <div className="booking-avatar" style={{ background: 'linear-gradient(135deg,var(--blue-100),var(--emerald-100))', color: 'var(--blue-700)' }}>
+                  📅
+                </div>
+                <div className="booking-copy">
+                  <span className="booking-name">
+                    {new Date(slot.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                  </span>
+                  <span className="booking-subtitle">{slot.startTime} – {slot.endTime}</span>
+                </div>
+              </div>
+              <div className="booking-time-block">
+                <span className="slot-price">₹{MOCK_SESSION_PRICE}</span>
+              </div>
+              <button className="book-slot-btn" onClick={() => setSelectedSlot(slot)}>
+                Book slot
+              </button>
             </div>
-
-            <div>
-              <strong>Time:</strong>{' '}
-              {slot.startTime} - {slot.endTime}
-            </div>
-
-            <div className="slot-price">₹{MOCK_SESSION_PRICE}</div>
-
-            <button onClick={() => setSelectedSlot(slot)}>
-              Select slot
-            </button>
-          </div>
-        ))
+          ))}
+        </div>
       )}
 
       <MentorReviews mentorId={mentorId} user={user} />
