@@ -6,7 +6,7 @@ import StudentBookings from './StudentBookings'
 import { getMyMentor, getMentors } from '../api'
 import MentorProfile from './MentorProfile'
 
-export default function Dashboard({ user }) {
+export default function Dashboard({ user, onViewProfile, onExplore }) {
   const [mentorProfile, setMentorProfile] = useState(null)
   const [mentors, setMentors] = useState([])
   const [selectedMentorId, setSelectedMentorId] = useState('')
@@ -106,6 +106,8 @@ export default function Dashboard({ user }) {
         <h2>Welcome, {user.name}</h2>
         <p>Role: {user.role}</p>
         <p>Email: {user.email}</p>
+        {onViewProfile && <button onClick={onViewProfile}>View Profile</button>}
+        {onExplore && <button onClick={onExplore} style={{ marginLeft: 8 }}>Explore Categories</button>}
       </div>
 
       <div className="card">
@@ -122,7 +124,7 @@ export default function Dashboard({ user }) {
           >
             {mentors.map((mentor) => (
               <option key={mentor._id || mentor.id} value={mentor._id || mentor.id}>
-                {mentor.name} ({mentor.email})
+                {mentor.name}
               </option>
             ))}
           </select>

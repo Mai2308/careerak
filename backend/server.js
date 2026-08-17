@@ -9,9 +9,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
-const usersRoutes = require('./routes/users');
+const userRoutes = require('./routes/users');
+const exploreRoutes = require('./routes/explore');
 const availabilityRoutes = require('./routes/availability');
 const bookingRoutes = require('./routes/booking');
+const mentorsRoutes = require('./routes/mentors');
 
 const app = express();
 const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000')
@@ -23,11 +25,10 @@ app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
-app.use('/api/users', usersRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/explore', exploreRoutes);
 app.use('/api/availability', availabilityRoutes);
 app.use('/api/bookings', bookingRoutes);
-
-const mentorsRoutes = require('./routes/mentors');
 app.use('/api/mentors', mentorsRoutes);
 
 const PORT = process.env.PORT || 5000;

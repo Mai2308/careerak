@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 const availabilitySchema = new mongoose.Schema(
   {
     mentorId: {
@@ -26,4 +27,5 @@ const availabilitySchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
 module.exports = mongoose.model('Availability', availabilitySchema);
