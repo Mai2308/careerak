@@ -6,7 +6,7 @@ import StudentBookings from './StudentBookings'
 import { getMyMentor, getMentors } from '../api'
 import MentorProfile from './MentorProfile'
 
-export default function Dashboard({ user, onViewProfile, onExplore }) {
+export default function Dashboard({ user, onViewProfile, onExplore, onOpenMessages }) {
   const [mentorProfile, setMentorProfile] = useState(null)
   const [mentors, setMentors] = useState([])
   const [selectedMentorId, setSelectedMentorId] = useState('')
@@ -207,18 +207,31 @@ export default function Dashboard({ user, onViewProfile, onExplore }) {
             {filteredMentors.map((mentor) => {
               const id = mentor._id || mentor.id
               return (
-                <button
-                  type="button"
+                <div
                   key={id}
                   className={`mentor-card${selectedMentorId === id ? ' active' : ''}`}
                   onClick={() => setSelectedMentorId(id)}
+                  style={{ cursor: 'pointer' }}
                 >
-                  <strong>{mentor.name}</strong>
+                  <div className="mentor-card-header">
+                    <strong>{mentor.name}</strong>
+                    <button
+                      type="button"
+                      className="message-icon-btn"
+                      title={`Message ${mentor.name}`}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        if (onOpenMessages) onOpenMessages(mentor)
+                      }}
+                    >
+                      💬
+                    </button>
+                  </div>
                   <span className="mentor-rating">⭐ {mentor.rating ? mentor.rating.toFixed(1) : 'New'}</span>
                   {mentor.interests?.length > 0 && (
                     <span className="muted">{mentor.interests.join(', ')}</span>
                   )}
-                </button>
+                </div>
               )
             })}
           </div>
