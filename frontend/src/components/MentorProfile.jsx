@@ -6,8 +6,7 @@ export default function MentorProfile({ initial = null, onSaved }){
     name: initial?.name || (JSON.parse(sessionStorage.getItem('user')||'null')?.name) || '',
     title: initial?.title || '',
     bio: initial?.bio || '',
-    skills: (initial?.skills || []).join(', '),
-    availableSlots: (initial?.availableSlots || []).join(', ')
+    skills: (initial?.skills || []).join(', ')
   })
   const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState(null)
@@ -21,8 +20,7 @@ export default function MentorProfile({ initial = null, onSaved }){
         name: form.name,
         title: form.title,
         bio: form.bio,
-        skills: form.skills.split(',').map(s=>s.trim()).filter(Boolean),
-        availableSlots: form.availableSlots.split(',').map(s=>s.trim()).filter(Boolean)
+        skills: form.skills.split(',').map(s=>s.trim()).filter(Boolean)
       }
       const res = await createMentor(payload)
       onSaved && onSaved(res)
@@ -40,7 +38,6 @@ export default function MentorProfile({ initial = null, onSaved }){
       <input placeholder="Title" value={form.title} onChange={e=>setForm({...form,title:e.target.value})} />
       <textarea placeholder="Bio" value={form.bio} onChange={e=>setForm({...form,bio:e.target.value})} />
       <input placeholder="Skills (comma separated)" value={form.skills} onChange={e=>setForm({...form,skills:e.target.value})} />
-      <input placeholder="Available slots (comma separated)" value={form.availableSlots} onChange={e=>setForm({...form,availableSlots:e.target.value})} />
       <div style={{display:'flex',gap:8}}>
         <button className="action" type="submit" disabled={loading}>{loading ? 'Saving...' : 'Save profile'}</button>
       </div>
