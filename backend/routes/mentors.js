@@ -51,8 +51,31 @@ router.post('/:mentorId/reviews', auth, async (req, res) => {
 // Create or update mentor profile for authenticated user
 router.post('/', auth, async (req, res) => {
   try{
-    const { name, title, bio, skills, availableSlots } = req.body;
-    const data = { name, title, bio, skills, availableSlots, email: req.user.email, userId: req.user._id };
+    const { name, title, bio, skills, availableSlots, sessionPrice, currency = 'EGP' } = req.body;
+    const numericPrice = Number(sessionPrice);
+
+    if (sessionPrice !== undefined && (!Number.isFinite(numericPrice) || numericPrice <= 0)) {
+      return res.status(400).json({ message: 'Session price must be a positive number' });
+    }
+
+    const normalizedCurrency = (currency || 'EGP').toUpperCase();
+    const data = {
+      name,
+      title,
+      bio,
+      skills,
+      availableSlots,
+      sessionPrice: numericPrice || 0,
+      currency: normalizedCurrency,
+      email: req.user.email,
+      userId: req.user._id
+    };
+
+    await User.findByIdAndUpdate(req.user._id, {
+      sessionPrice: numericPrice || 0,
+      currency: normalizedCurrency
+    });
+
     let mentor = await Mentor.findOne({ userId: req.user._id });
     if (mentor){
       Object.assign(mentor, data);

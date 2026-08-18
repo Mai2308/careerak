@@ -3,7 +3,7 @@ const Availability = require('../models/Availability');
 
 const createMockPayment = async (req, res) => {
   try {
-    const { amount, currency = 'INR' } = req.body;
+    const { amount, currency = 'EGP' } = req.body;
 
     if (!amount || Number(amount) <= 0) {
       return res.status(400).json({
@@ -37,7 +37,7 @@ const createBooking = async (req, res) => {
       paymentStatus,
       paymentReference,
       amount,
-      currency = 'INR'
+      currency = 'EGP'
     } = req.body;
 
     if (!studentId || !availabilityId) {

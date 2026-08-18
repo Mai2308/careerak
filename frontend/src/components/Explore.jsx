@@ -78,7 +78,7 @@ export default function Explore({ onBack, onOpenMessages }){
   return (
     <div className="card">
       <h2>Explore Categories</h2>
-      <button onClick={onBack}>Back to Dashboard</button>
+      <button className="link-button inline-back" onClick={onBack}>← Back to Dashboard</button>
       {msg && <p className="msg">{msg}</p>}
       {loading && <p>Loading...</p>}
 
@@ -97,7 +97,7 @@ export default function Explore({ onBack, onOpenMessages }){
 
       {!loading && step === 'fields' && (
         <div>
-          <button onClick={backToCategories}>&larr; Categories</button>
+          <button className="link-button inline-back" onClick={backToCategories}>&larr; Categories</button>
           <h3>{selectedCategory?.name} fields</h3>
           <ul>
             {fields.map(f => (
@@ -111,7 +111,7 @@ export default function Explore({ onBack, onOpenMessages }){
 
       {!loading && step === 'mentors' && (
         <div>
-          <button onClick={backToFields}>&larr; Fields</button>
+          <button className="link-button inline-back" onClick={backToFields}>&larr; Fields</button>
           <h3>Mentors in {selectedField?.name}</h3>
           {notice && <p>{notice}</p>}
           {mentors.length === 0 && suggestions.length > 0 && (

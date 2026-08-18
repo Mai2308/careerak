@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import {
   getMentorAvailability,
+  getMentorById,
   createMockPayment,
   createBooking
 } from '../api'
 import MentorReviews from './MentorReviews'
 
-const MOCK_SESSION_PRICE = 2500
-
 export default function AvailableSlots({ user, mentorId }) {
+  const [mentor, setMentor] = useState(null)
   const [slots, setSlots] = useState([])
   const [selectedSlot, setSelectedSlot] = useState(null)
   const [cardName, setCardName] = useState(user?.name || '')
@@ -39,23 +39,44 @@ export default function AvailableSlots({ user, mentorId }) {
   }
 
   useEffect(() => {
-    if (mentorId) {
-      loadSlots()
+    if (!mentorId) {
+      setMentor(null)
+      return
     }
+
+    async function loadMentor() {
+      try {
+        const data = await getMentorById(mentorId)
+        setMentor(data)
+      } catch (err) {
+        console.error('Failed to load mentor profile', err)
+        setMentor(null)
+      }
+    }
+
+    loadMentor()
+    loadSlots()
   }, [mentorId])
 
   useEffect(() => {
     if (user?.name) setCardName(user.name)
   }, [user])
 
+  const sessionPrice = Number(mentor?.sessionPrice || 0)
+  const sessionCurrency = mentor?.currency || 'EGP'
+
   async function handleBook(availabilityId) {
     try {
       setError('')
       setMessage('')
 
+      if (!sessionPrice || sessionPrice <= 0) {
+        throw new Error('This mentor has not set a valid session price yet.')
+      }
+
       const payment = await createMockPayment({
-        amount: MOCK_SESSION_PRICE,
-        currency: 'INR'
+        amount: sessionPrice,
+        currency: sessionCurrency
       })
 
       await createBooking({
@@ -67,7 +88,7 @@ export default function AvailableSlots({ user, mentorId }) {
         currency: payment.currency
       })
 
-      setMessage(`Payment successful and session booked for ₹${payment.amount}`)
+      setMessage(`Payment successful and session booked for ${sessionCurrency} ${payment.amount}`)
       setSelectedSlot(null)
       await loadSlots()
     } catch (err) {
@@ -77,15 +98,15 @@ export default function AvailableSlots({ user, mentorId }) {
 
   if (!mentorId) {
     return (
-      <div className="card">
-        <p>Please select a mentor first.</p>
+      <div className="surface-panel booking-panel">
+        <p className="muted">Please select a mentor first.</p>
       </div>
     )
   }
 
   return (
-    <div className="card">
-      <h2>Available Sessions</h2>
+    <div className="surface-panel booking-panel">
+      <h3 className="panel-title light">AVAILABLE SESSIONS</h3>
 
       {error && <p className="error-message">{error}</p>}
       {message && <p className="success-message">{message}</p>}
@@ -108,7 +129,7 @@ export default function AvailableSlots({ user, mentorId }) {
                 {new Date(selectedSlot.date).toLocaleDateString()} · {selectedSlot.startTime} - {selectedSlot.endTime}
               </p>
             </div>
-            <div className="price-box">₹{MOCK_SESSION_PRICE}</div>
+            <div className="price-box">{sessionCurrency} {sessionPrice}</div>
           </div>
 
           <div className="card-preview">
@@ -144,7 +165,7 @@ export default function AvailableSlots({ user, mentorId }) {
             </div>
 
             <button onClick={() => handleBook(selectedSlot._id)} className="pay-button">
-              Pay ₹{MOCK_SESSION_PRICE} & confirm booking
+              Pay {sessionCurrency} {sessionPrice} & confirm booking
             </button>
 
             <button className="secondary-button" onClick={() => setSelectedSlot(null)}>
@@ -153,25 +174,27 @@ export default function AvailableSlots({ user, mentorId }) {
           </div>
         </div>
       ) : (
-        slots.map((slot) => (
-          <div className="slot-card" key={slot._id}>
-            <div>
-              <strong>Date:</strong>{' '}
-              {new Date(slot.date).toLocaleDateString()}
+        <div className="slot-list">
+          {slots.map((slot) => (
+            <div className="slot-card" key={slot._id}>
+              <div>
+                <strong>Date:</strong>{' '}
+                {new Date(slot.date).toLocaleDateString()}
+              </div>
+
+              <div>
+                <strong>Time:</strong>{' '}
+                {slot.startTime} - {slot.endTime}
+              </div>
+
+              <div className="slot-price">{sessionCurrency} {sessionPrice}</div>
+
+              <button onClick={() => setSelectedSlot(slot)}>
+                Select slot
+              </button>
             </div>
-
-            <div>
-              <strong>Time:</strong>{' '}
-              {slot.startTime} - {slot.endTime}
-            </div>
-
-            <div className="slot-price">₹{MOCK_SESSION_PRICE}</div>
-
-            <button onClick={() => setSelectedSlot(slot)}>
-              Select slot
-            </button>
-          </div>
-        ))
+          ))}
+        </div>
       )}
 
       <MentorReviews mentorId={mentorId} user={user} />

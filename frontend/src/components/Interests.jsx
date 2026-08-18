@@ -64,33 +64,44 @@ export default function Interests({ onBack }){
     return acc
   }, {})
 
+  const selectedCountIn = (catFields) => catFields.filter(f => selectedIds.has(f._id)).length
+
   return (
     <div className="card">
       <h2>Choose Fields of Interest</h2>
-      <button onClick={onBack}>Back to Profile</button>
+      <button className="link-button inline-back" onClick={onBack}>← Back to Profile</button>
       {loading && <p>Loading fields...</p>}
       {msg && <p className="msg">{msg}</p>}
 
       {!loading && (
         <div>
           <p>Select one or more fields, then confirm. You can change these anytime.</p>
-          {Object.entries(fieldsByCategory).map(([catName, catFields]) => (
-            <div key={catName}>
-              <h4>{catName}</h4>
-              {catFields.map(f => (
-                <label key={f._id} style={{ display: 'block' }}>
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.has(f._id)}
-                    onChange={()=>toggleField(f._id)}
-                  />
-                  {' '}{f.name}
-                </label>
-              ))}
-            </div>
-          ))}
-          <button onClick={confirm} disabled={saving}>{saving ? 'Saving...' : 'Confirm Interests'}</button>
-          {saved && <p style={{color:'green'}}>Your interests have been saved.</p>}
+          <div className="field-category-list">
+            {Object.entries(fieldsByCategory).map(([catName, catFields]) => (
+              <details key={catName} className="field-category-dropdown">
+                <summary>
+                  {catName}
+                  {selectedCountIn(catFields) > 0 && (
+                    <span className="field-category-count">{selectedCountIn(catFields)} selected</span>
+                  )}
+                </summary>
+                <div className="field-category-options">
+                  {catFields.map(f => (
+                    <label key={f._id} className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(f._id)}
+                        onChange={()=>toggleField(f._id)}
+                      />
+                      {f.name}
+                    </label>
+                  ))}
+                </div>
+              </details>
+            ))}
+          </div>
+          <button className="pill-button inline-action" onClick={confirm} disabled={saving}>{saving ? 'Saving...' : 'Confirm Interests'}</button>
+          {saved && <p className="success-message">Your interests have been saved.</p>}
         </div>
       )}
 
