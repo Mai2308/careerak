@@ -186,6 +186,84 @@ test('cancels a booking and reopens the availability slot', async () => {
   assert.ok(availabilityRes.body.some((slot) => slot._id === createdAvailabilityId && slot.status === 'available'));
 });
 
+<<<<<<< HEAD
+test('allows sending and receiving messages between student and mentor', async () => {
+  // Login student to get token
+  const studentLogin = await request.post('/api/auth/login').send({
+    email: 'alice@example.com',
+    password: 'secret123'
+  });
+  const studentToken = studentLogin.body.token;
+
+  // Login mentor to get token
+  const mentorLogin = await request.post('/api/auth/login').send({
+    email: 'bob@example.com',
+    password: 'secret123'
+  });
+  const mentorToken = mentorLogin.body.token;
+
+  // Student sends message to mentor
+  const sendRes = await request
+    .post('/api/messages')
+    .set('Authorization', `Bearer ${studentToken}`)
+    .send({
+      receiverId: mentorUserId,
+      content: 'Hello Bob! I would like to ask about career advice.'
+    });
+
+  assert.equal(sendRes.status, 201);
+  assert.equal(sendRes.body.content, 'Hello Bob! I would like to ask about career advice.');
+
+  // Mentor gets conversations list
+  const convRes = await request
+    .get('/api/messages/conversations')
+    .set('Authorization', `Bearer ${mentorToken}`);
+
+  assert.equal(convRes.status, 200);
+  assert.ok(Array.isArray(convRes.body));
+  assert.ok(convRes.body.some((c) => c.user._id === studentUserId));
+
+  // Mentor gets message thread with student
+  const threadRes = await request
+    .get(`/api/messages/${studentUserId}`)
+    .set('Authorization', `Bearer ${mentorToken}`);
+
+  assert.equal(threadRes.status, 200);
+  assert.ok(Array.isArray(threadRes.body.messages));
+  assert.equal(threadRes.body.messages.length, 1);
+  assert.equal(threadRes.body.messages[0].content, 'Hello Bob! I would like to ask about career advice.');
+});
+
+test('returns correct unread message count notification for user', async () => {
+  const studentLogin = await request.post('/api/auth/login').send({
+    email: 'alice@example.com',
+    password: 'secret123'
+  });
+  const studentToken = studentLogin.body.token;
+
+  const mentorLogin = await request.post('/api/auth/login').send({
+    email: 'bob@example.com',
+    password: 'secret123'
+  });
+  const mentorToken = mentorLogin.body.token;
+
+  // Student sends a new message to mentor
+  await request
+    .post('/api/messages')
+    .set('Authorization', `Bearer ${studentToken}`)
+    .send({
+      receiverId: mentorUserId,
+      content: 'Hi Bob, another question for you!'
+    });
+
+  // Check unread count for mentor
+  const unreadRes = await request
+    .get('/api/messages/unread-count')
+    .set('Authorization', `Bearer ${mentorToken}`);
+
+  assert.equal(unreadRes.status, 200);
+  assert.ok(unreadRes.body.unreadCount >= 1);
+=======
 test('accepts a mentor-defined session price and stores it in EGP', async () => {
   const loginRes = await request.post('/api/auth/login').send({
     email: 'bob@example.com',
@@ -241,4 +319,5 @@ test('defaults mock payment currency to EGP', async () => {
 
   assert.equal(res.status, 200);
   assert.equal(res.body.currency, 'EGP');
+>>>>>>> origin/main
 });

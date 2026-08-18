@@ -14,6 +14,7 @@ const exploreRoutes = require('./routes/explore');
 const availabilityRoutes = require('./routes/availability');
 const bookingRoutes = require('./routes/booking');
 const mentorsRoutes = require('./routes/mentors');
+const messageRoutes = require('./routes/messages');
 
 const app = express();
 const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000')
@@ -30,6 +31,7 @@ app.use('/api/explore', exploreRoutes);
 app.use('/api/availability', availabilityRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/mentors', mentorsRoutes);
+app.use('/api/messages', messageRoutes);
 
 const PORT = process.env.PORT || 5000;
 let MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/careerak';

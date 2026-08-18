@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { getCategories, getFieldsByCategory, getMentorsByField } from '../api'
 
-export default function Explore({ onBack }){
+export default function Explore({ onBack, onOpenMessages }){
   const [step, setStep] = useState('categories') // categories | fields | mentors
   const [categories, setCategories] = useState([])
   const [selectedCategory, setSelectedCategory] = useState(null)
@@ -129,8 +129,18 @@ export default function Explore({ onBack }){
           {mentors.length > 0 && (
             <ul>
               {mentors.map(m => (
-                <li key={m._id}>
-                  <strong>{m.name}</strong> — Rating: {m.rating}
+                <li key={m._id} style={{ marginBottom: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <strong>{m.name}</strong> — Rating: {m.rating}
+                    <button
+                      type="button"
+                      className="message-icon-btn"
+                      title={`Message ${m.name}`}
+                      onClick={() => onOpenMessages && onOpenMessages(m)}
+                    >
+                      💬
+                    </button>
+                  </div>
                   {m.availableSessions && m.availableSessions.length > 0 ? (
                     <ul>
                       {m.availableSessions.map(s => (

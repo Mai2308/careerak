@@ -201,3 +201,31 @@ export async function cancelBooking(bookingId) {
   const res = await fetch(`${API_BASE}/api/bookings/${bookingId}/cancel`, { method: 'PATCH' })
   return parseResponse(res)
 }
+
+// =======================
+// MESSAGES
+// =======================
+
+export async function sendMessage(payload) {
+  const res = await fetch(`${API_BASE}/api/messages`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(payload)
+  })
+  return parseResponse(res)
+}
+
+export async function getConversations() {
+  const res = await fetch(`${API_BASE}/api/messages/conversations`, { headers: authHeaders() })
+  return parseResponse(res)
+}
+
+export async function getMessagesWithUser(otherUserId) {
+  const res = await fetch(`${API_BASE}/api/messages/${otherUserId}`, { headers: authHeaders() })
+  return parseResponse(res)
+}
+
+export async function getUnreadMessageCount() {
+  const res = await fetch(`${API_BASE}/api/messages/unread-count`, { headers: authHeaders() })
+  return parseResponse(res)
+}
