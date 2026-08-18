@@ -10,10 +10,10 @@ export default function Landing({ onGetStarted, onFindMentor, onJoinAsMentor, on
   return (
     <div className="landing">
       <header className="landing-header">
-        <div className="logo">
-          <span className="logo-icon">🎓</span>
-          <span>Careerak</span>
+        <div className="brand-mark">
+          <img src="/logo.png" alt="Careerak Logo" className="logo-image" />
         </div>
+        
         <nav>
           <button className="link-button" onClick={onLogin}>Log in</button>
           <button className="pill-button" onClick={onGetStarted}>Get started</button>
