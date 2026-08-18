@@ -8,7 +8,7 @@ const Field = require('../models/Field');
 router.get('/mentors', async (req, res) => {
   try {
     const mentors = await User.find({ role: 'mentor' })
-      .select('name interests educationLevel rating')
+      .select('name interests educationLevel rating sessionPrice currency')
       .sort({ name: 1 })
       .lean();
 
@@ -18,7 +18,9 @@ router.get('/mentors', async (req, res) => {
       name: mentor.name,
       interests: mentor.interests || [],
       educationLevel: mentor.educationLevel || 'undergraduate',
-      rating: mentor.rating || 0
+      rating: mentor.rating || 0,
+      sessionPrice: mentor.sessionPrice || 0,
+      currency: mentor.currency || 'EGP'
     })));
   } catch (error) {
     res.status(500).json({ message: 'Failed to get mentors', error: error.message });

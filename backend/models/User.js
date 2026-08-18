@@ -9,6 +9,8 @@ const userSchema = new mongoose.Schema({
   educationLevel: { type: String, enum: ['undergraduate','graduate','other'], default: 'undergraduate' },
   field: { type: mongoose.Schema.Types.ObjectId, ref: 'Field' },
   interestedFields: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Field' }],
+  sessionPrice: { type: Number, default: 0 },
+  currency: { type: String, default: 'EGP' },
   rating: { type: Number, default: 0 },
   reviewCount: { type: Number, default: 0 }
 }, { timestamps: true });

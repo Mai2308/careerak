@@ -28,7 +28,7 @@ const bookingSchema = new mongoose.Schema(
     },
     currency: {
       type: String,
-      default: 'INR'
+      default: 'EGP'
     },
     paymentStatus: {
       type: String,

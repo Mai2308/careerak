@@ -185,3 +185,60 @@ test('cancels a booking and reopens the availability slot', async () => {
   const availabilityRes = await request.get(`/api/availability/mentor/${mentorUserId}`);
   assert.ok(availabilityRes.body.some((slot) => slot._id === createdAvailabilityId && slot.status === 'available'));
 });
+
+test('accepts a mentor-defined session price and stores it in EGP', async () => {
+  const loginRes = await request.post('/api/auth/login').send({
+    email: 'bob@example.com',
+    password: 'secret123'
+  });
+
+  const res = await request.post('/api/mentors')
+    .set('Authorization', `Bearer ${loginRes.body.token}`)
+    .send({
+      name: 'Bob Mentor',
+      title: 'Product mentor',
+      bio: 'Helps teams launch faster.',
+      skills: ['Product Strategy'],
+      availableSlots: ['2026-08-19T09:00:00.000Z'],
+      sessionPrice: 1500
+    });
+
+  assert.equal(res.status, 200);
+  assert.equal(res.body.sessionPrice, 1500);
+  assert.equal(res.body.currency, 'EGP');
+});
+
+test('persists mentor bio and skills when saving the profile', async () => {
+  const loginRes = await request.post('/api/auth/login').send({
+    email: 'bob@example.com',
+    password: 'secret123'
+  });
+
+  const res = await request.post('/api/mentors')
+    .set('Authorization', `Bearer ${loginRes.body.token}`)
+    .send({
+      name: 'Bob Mentor',
+      title: 'Senior product mentor',
+      bio: 'I coach founders and PMs.',
+      skills: ['Product Strategy', 'Interview Prep'],
+      availableSlots: ['2026-08-21T09:00:00.000Z'],
+      sessionPrice: 1800
+    });
+
+  const profileRes = await request.get('/api/mentors/me')
+    .set('Authorization', `Bearer ${loginRes.body.token}`);
+
+  assert.equal(res.status, 200);
+  assert.equal(profileRes.status, 200);
+  assert.equal(profileRes.body.bio, 'I coach founders and PMs.');
+  assert.deepEqual(profileRes.body.skills, ['Product Strategy', 'Interview Prep']);
+});
+
+test('defaults mock payment currency to EGP', async () => {
+  const res = await request.post('/api/bookings/mock-payment').send({
+    amount: 2200
+  });
+
+  assert.equal(res.status, 200);
+  assert.equal(res.body.currency, 'EGP');
+});
