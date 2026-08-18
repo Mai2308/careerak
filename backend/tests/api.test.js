@@ -186,7 +186,6 @@ test('cancels a booking and reopens the availability slot', async () => {
   assert.ok(availabilityRes.body.some((slot) => slot._id === createdAvailabilityId && slot.status === 'available'));
 });
 
-<<<<<<< HEAD
 test('allows sending and receiving messages between student and mentor', async () => {
   // Login student to get token
   const studentLogin = await request.post('/api/auth/login').send({
@@ -263,7 +262,8 @@ test('returns correct unread message count notification for user', async () => {
 
   assert.equal(unreadRes.status, 200);
   assert.ok(unreadRes.body.unreadCount >= 1);
-=======
+});
+
 test('accepts a mentor-defined session price and stores it in EGP', async () => {
   const loginRes = await request.post('/api/auth/login').send({
     email: 'bob@example.com',
@@ -319,5 +319,4 @@ test('defaults mock payment currency to EGP', async () => {
 
   assert.equal(res.status, 200);
   assert.equal(res.body.currency, 'EGP');
->>>>>>> origin/main
 });

@@ -14,6 +14,11 @@ async function parseResponse(res) {
   }
 
   if (!res.ok) {
+    if (res.status === 401) {
+      sessionStorage.removeItem('token')
+      sessionStorage.removeItem('user')
+      window.dispatchEvent(new Event('auth:unauthorized'))
+    }
     const message = data?.message || `Request failed with status ${res.status}`
     throw new Error(message)
   }
@@ -96,6 +101,32 @@ export async function submitMentorReview(mentorId, payload) {
 
 export async function getProfile() {
   const res = await fetch(`${API_BASE}/api/users/me`, { headers: authHeaders() })
+  return parseResponse(res)
+}
+
+export async function updateProfile(payload) {
+  const res = await fetch(`${API_BASE}/api/users/me`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(payload)
+  })
+  return parseResponse(res)
+}
+
+export async function changePassword(payload) {
+  const res = await fetch(`${API_BASE}/api/users/me/password`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(payload)
+  })
+  return parseResponse(res)
+}
+
+export async function deleteAccount() {
+  const res = await fetch(`${API_BASE}/api/users/me`, {
+    method: 'DELETE',
+    headers: authHeaders()
+  })
   return parseResponse(res)
 }
 

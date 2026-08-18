@@ -51,7 +51,7 @@ router.post('/:mentorId/reviews', auth, async (req, res) => {
 // Create or update mentor profile for authenticated user
 router.post('/', auth, async (req, res) => {
   try{
-    const { name, title, bio, skills, availableSlots, sessionPrice, currency = 'EGP' } = req.body;
+    const { name, title, bio, skills, category, availableSlots, sessionPrice, currency = 'EGP' } = req.body;
     const numericPrice = Number(sessionPrice);
 
     if (sessionPrice !== undefined && (!Number.isFinite(numericPrice) || numericPrice <= 0)) {
@@ -64,6 +64,8 @@ router.post('/', auth, async (req, res) => {
       title,
       bio,
       skills,
+      category,
+      interests: category ? [category] : [],
       availableSlots,
       sessionPrice: numericPrice || 0,
       currency: normalizedCurrency,
@@ -71,10 +73,16 @@ router.post('/', auth, async (req, res) => {
       userId: req.user._id
     };
 
-    await User.findByIdAndUpdate(req.user._id, {
+    const userUpdate = {
       sessionPrice: numericPrice || 0,
       currency: normalizedCurrency
-    });
+    };
+    if (category) {
+      userUpdate.category = category;
+      userUpdate.interests = [category];
+    }
+
+    await User.findByIdAndUpdate(req.user._id, userUpdate);
 
     let mentor = await Mentor.findOne({ userId: req.user._id });
     if (mentor){

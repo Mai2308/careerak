@@ -1,10 +1,21 @@
 import React, { useState } from 'react'
 import { createMentor } from '../api'
 
+const CATEGORY_OPTIONS = [
+  'Technology',
+  'Business & Finance',
+  'Design & Creative',
+  'Marketing',
+  'Engineering',
+  'Health & Science',
+  'Education'
+]
+
 export default function MentorProfile({ initial = null, onSaved }){
   const [form, setForm] = useState({
     name: initial?.name || (JSON.parse(sessionStorage.getItem('user')||'null')?.name) || '',
     title: initial?.title || '',
+    category: initial?.category || CATEGORY_OPTIONS[0],
     bio: initial?.bio || '',
     skills: (initial?.skills || []).join(', '),
     availableSlots: (initial?.availableSlots || []).join(', '),
@@ -27,6 +38,7 @@ export default function MentorProfile({ initial = null, onSaved }){
       const payload = {
         name: form.name,
         title: form.title,
+        category: form.category,
         bio: form.bio,
         skills: form.skills.split(',').map(s=>s.trim()).filter(Boolean),
         availableSlots: form.availableSlots.split(',').map(s=>s.trim()).filter(Boolean),
@@ -47,6 +59,19 @@ export default function MentorProfile({ initial = null, onSaved }){
       {msg && <p style={{color: msg.includes('failed') ? 'crimson' : 'green'}}>{msg}</p>}
       <input placeholder="Name" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} required />
       <input placeholder="Title" value={form.title} onChange={e=>setForm({...form,title:e.target.value})} />
+
+      <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontWeight: 600, color: 'var(--slate-700)' }}>
+        <span>Mentor Category</span>
+        <select
+          value={form.category}
+          onChange={e=>setForm({...form,category:e.target.value})}
+          style={{ padding: '10px 14px', borderRadius: 8, border: '1px solid var(--slate-200)', fontSize: 15 }}
+        >
+          {CATEGORY_OPTIONS.map(cat => (
+            <option key={cat} value={cat}>{cat}</option>
+          ))}
+        </select>
+      </label>
       <textarea placeholder="Bio" value={form.bio} onChange={e=>setForm({...form,bio:e.target.value})} />
       <input placeholder="Skills (comma separated)" value={form.skills} onChange={e=>setForm({...form,skills:e.target.value})} />
       <input placeholder="Available slots (comma separated)" value={form.availableSlots} onChange={e=>setForm({...form,availableSlots:e.target.value})} />

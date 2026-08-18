@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
   role: { type: String, enum: ['student','mentor'], default: 'student' },
   interests: { type: [String], default: [] },
   educationLevel: { type: String, enum: ['undergraduate','graduate','other'], default: 'undergraduate' },
+  category: { type: String, default: '' },
   field: { type: mongoose.Schema.Types.ObjectId, ref: 'Field' },
   interestedFields: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Field' }],
   sessionPrice: { type: Number, default: 0 },

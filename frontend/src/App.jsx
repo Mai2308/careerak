@@ -43,6 +43,13 @@ export default function App() {
     } catch (e) {
       /* ignore */
     }
+
+    const handleUnauthorized = () => {
+      setUser(null)
+      setView('login')
+    }
+    window.addEventListener('auth:unauthorized', handleUnauthorized)
+    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized)
   }, [])
 
   useEffect(() => {
@@ -111,23 +118,26 @@ export default function App() {
                 <img src="/logo.png" alt="Careerak Logo" className="logo-image" />
               </div>
               <nav>
-<<<<<<< HEAD
-                <button className="link-button" onClick={()=>setView('dashboard')}>Dashboard</button>
-                <button className="link-button" onClick={()=>setView('profile')}>Profile</button>
-                <button className="link-button nav-messages-btn" onClick={()=>openMessagesWith(null)}>
-                  💬 Messages
-                  {unreadCount > 0 && <span className="unread-notification-badge">{unreadCount}</span>}
-                </button>
-                <button type="button" className="theme-toggle" onClick={()=>setDarkMode(!darkMode)}>
-=======
                 <button className="link-button" onClick={() => setView('dashboard')}>
                   Dashboard
                 </button>
                 <button className="link-button" onClick={() => setView('profile')}>
                   Profile
                 </button>
-                <button type="button" className="theme-toggle" onClick={() => setDarkMode(!darkMode)}>
->>>>>>> origin/main
+                <button
+                  className="link-button nav-messages-btn"
+                  onClick={() => openMessagesWith(null)}
+                >
+                  💬 Messages
+                  {unreadCount > 0 && (
+                    <span className="unread-notification-badge">{unreadCount}</span>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className="theme-toggle"
+                  onClick={() => setDarkMode(!darkMode)}
+                >
                   {darkMode ? '☀️ Light' : '🌙 Dark'}
                 </button>
                 <button onClick={handleLogout}>Log out</button>
@@ -149,7 +159,11 @@ export default function App() {
                 <button className="link-button" onClick={() => setView('login')}>
                   Log in
                 </button>
-                <button type="button" className="theme-toggle" onClick={() => setDarkMode(!darkMode)}>
+                <button
+                  type="button"
+                  className="theme-toggle"
+                  onClick={() => setDarkMode(!darkMode)}
+                >
                   {darkMode ? '☀️ Light' : '🌙 Dark'}
                 </button>
               </nav>
@@ -161,10 +175,19 @@ export default function App() {
       <main className={user ? 'app-main' : 'full-width-main'}>
         {user ? (
           view === 'profile' ? (
-            <Profile user={user} onBack={() => setView('dashboard')} />
+            <Profile
+              user={user}
+              onBack={() => setView('dashboard')}
+              onLogout={handleLogout}
+              onUserUpdated={(updatedUser) => {
+                setUser(updatedUser)
+                try {
+                  sessionStorage.setItem('user', JSON.stringify(updatedUser))
+                } catch {}
+              }}
+            />
           ) : view === 'explore' ? (
-<<<<<<< HEAD
-            <Explore onBack={()=>setView('dashboard')} onOpenMessages={(mentor) => openMessagesWith(mentor)} />
+            <Explore onBack={() => setView('dashboard')} onOpenMessages={(mentor) => openMessagesWith(mentor)} />
           ) : (
             <Dashboard
               user={user}
@@ -172,11 +195,6 @@ export default function App() {
               onExplore={()=>setView('explore')}
               onOpenMessages={(mentor) => openMessagesWith(mentor)}
             />
-=======
-            <Explore onBack={() => setView('dashboard')} />
-          ) : (
-            <Dashboard user={user} onViewProfile={() => setView('profile')} onExplore={() => setView('explore')} />
->>>>>>> origin/main
           )
         ) : view === 'signup' ? (
           <Signup initialRole={signupRole} onAuth={handleAuth} onBack={() => setView('landing')} />
