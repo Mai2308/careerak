@@ -6,7 +6,9 @@ export default function MentorProfile({ initial = null, onSaved }){
     name: initial?.name || (JSON.parse(sessionStorage.getItem('user')||'null')?.name) || '',
     title: initial?.title || '',
     bio: initial?.bio || '',
-    skills: (initial?.skills || []).join(', ')
+    skills: (initial?.skills || []).join(', '),
+    availableSlots: (initial?.availableSlots || []).join(', '),
+    sessionPrice: initial?.sessionPrice ?? ''
   })
   const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState(null)
@@ -16,11 +18,20 @@ export default function MentorProfile({ initial = null, onSaved }){
     setMsg(null)
     setLoading(true)
     try{
+      const numericPrice = Number(form.sessionPrice)
+      if (form.sessionPrice !== '' && (!Number.isFinite(numericPrice) || numericPrice <= 0)) {
+        setMsg('Session price must be a positive number')
+        return
+      }
+
       const payload = {
         name: form.name,
         title: form.title,
         bio: form.bio,
-        skills: form.skills.split(',').map(s=>s.trim()).filter(Boolean)
+        skills: form.skills.split(',').map(s=>s.trim()).filter(Boolean),
+        availableSlots: form.availableSlots.split(',').map(s=>s.trim()).filter(Boolean),
+        sessionPrice: numericPrice || 0,
+        currency: 'EGP'
       }
       const res = await createMentor(payload)
       onSaved && onSaved(res)
@@ -38,6 +49,19 @@ export default function MentorProfile({ initial = null, onSaved }){
       <input placeholder="Title" value={form.title} onChange={e=>setForm({...form,title:e.target.value})} />
       <textarea placeholder="Bio" value={form.bio} onChange={e=>setForm({...form,bio:e.target.value})} />
       <input placeholder="Skills (comma separated)" value={form.skills} onChange={e=>setForm({...form,skills:e.target.value})} />
+      <input placeholder="Available slots (comma separated)" value={form.availableSlots} onChange={e=>setForm({...form,availableSlots:e.target.value})} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, border: '1px solid #dfe7ee', borderRadius: 8, padding: '10px 12px', background: '#f8fbff' }}>
+        <span style={{ fontWeight: 700, color: '#0e7a6a' }}>EGP</span>
+        <input
+          type="number"
+          min="1"
+          step="1"
+          placeholder="Session price"
+          value={form.sessionPrice}
+          onChange={e=>setForm({...form,sessionPrice:e.target.value})}
+          style={{ border: 'none', background: 'transparent', flex: 1, fontSize: 16, outline: 'none' }}
+        />
+      </div>
       <div style={{display:'flex',gap:8}}>
         <button className="action" type="submit" disabled={loading}>{loading ? 'Saving...' : 'Save profile'}</button>
       </div>

@@ -107,6 +107,7 @@ export default function Dashboard({ user, onViewProfile, onExplore }) {
               <div className="profile-body">
                 <p><strong>Bio</strong><span>{mentorProfile.bio || 'No bio yet.'}</span></p>
                 <p><strong>Skills</strong><span>{mentorProfile.skills?.join(', ') || 'No skills added yet.'}</span></p>
+                <p><strong>Session price</strong><span>{mentorProfile.sessionPrice ? `${mentorProfile.currency || 'EGP'} ${Number(mentorProfile.sessionPrice).toLocaleString()}` : 'Not set yet.'}</span></p>
               </div>
             </div>
 
