@@ -3,12 +3,14 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs'); // Ensure bcryptjs or bcrypt is installed
 const User = require('../models/User'); // Adjust if your User model is located elsewhere
+const dbConnect = require('../db.js');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'careerak-dev-secret';
 
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
+    await dbConnect();
     const { name, email, password, role, interests, educationLevel } = req.body || {};
 
     if (!name || !email || !password) {
