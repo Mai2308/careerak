@@ -3,131 +3,213 @@ import React from 'react'
 export default function MentorModal({ mentor, onClose, onOpenMessages }) {
   if (!mentor) return null
 
+  // Safely extract bio across different potential API field names
+  const bioText = mentor.bio || mentor.about || mentor.description
+
+  // Safely extract skills into an array
+  const skillsList = Array.isArray(mentor.skills)
+    ? mentor.skills
+    : typeof mentor.skills === 'string' && mentor.skills.trim()
+    ? mentor.skills.split(',').map((s) => s.trim())
+    : []
+
+  const initials = (mentor.name || 'Mentor')
+    .split(' ')
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
+
   return (
-    <div 
+    <div
+      className="modal-overlay"
+      onClick={onClose}
       style={{
         position: 'fixed',
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        backgroundColor: 'rgba(15, 23, 42, 0.65)',
+        backdropFilter: 'blur(4px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 9999,
+        zIndex: 1000,
         padding: '20px'
       }}
-      onClick={onClose}
     >
-      <div 
+      <div
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
         style={{
           background: '#ffffff',
-          color: '#333333',
-          padding: '28px',
-          borderRadius: '12px',
-          maxWidth: '520px',
+          borderRadius: '24px',
           width: '100%',
-          maxHeight: '85vh',
-          overflowY: 'auto',
-          position: 'relative',
-          boxShadow: '0 10px 25px rgba(0,0,0,0.3)'
+          maxWidth: '540px',
+          padding: '32px',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+          position: 'relative'
         }}
-        onClick={(e) => e.stopPropagation()}
       >
-        {/* Close button */}
-        <button 
+        {/* Close Button */}
+        <button
           onClick={onClose}
           style={{
             position: 'absolute',
-            top: '16px',
-            right: '16px',
+            top: '20px',
+            right: '20px',
+            background: '#f1f5f9',
             border: 'none',
-            background: 'transparent',
-            fontSize: '1.5rem',
+            borderRadius: '50%',
+            width: '36px',
+            height: '36px',
             cursor: 'pointer',
-            lineHeight: 1
+            fontSize: '16px',
+            color: '#64748b',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
         >
-          &times;
+          ✕
         </button>
 
-        <h2 style={{ marginTop: 0, marginBottom: '4px' }}>{mentor.name}</h2>
-        <p style={{ color: '#666', fontWeight: 600, marginTop: 0, marginBottom: '16px' }}>
-          {mentor.title || mentor.category || 'Mentor Profile'}
-        </p>
-
-        <hr style={{ border: '0', borderTop: '1px solid #eee', margin: '16px 0' }} />
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <div>
-            <strong>Category / Field:</strong>
-            <p style={{ margin: '4px 0 0 0', color: '#555' }}>
-              {mentor.category || 'General'}{mentor.field ? ` · ${mentor.field}` : ''}
-            </p>
+        {/* Top Header Section */}
+        <div style={{ display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '24px' }}>
+          <div
+            style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+              color: '#ffffff',
+              fontSize: '22px',
+              fontWeight: '700',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 8px 16px rgba(37, 99, 235, 0.2)',
+              flexShrink: 0
+            }}
+          >
+            {initials}
           </div>
 
           <div>
-            <strong>Bio:</strong>
-            <p style={{ margin: '4px 0 0 0', color: '#555', lineHeight: 1.5 }}>
-              {mentor.bio || 'No detailed bio provided.'}
+            <h3 style={{ fontSize: '22px', fontWeight: '800', color: '#0f172a', margin: 0 }}>
+              {mentor.name}
+            </h3>
+            <p style={{ color: '#64748b', fontSize: '14px', margin: '4px 0 0 0', fontWeight: '500' }}>
+              {mentor.title || 'Mentor'} • {mentor.category || 'Technology'}
+              {mentor.field ? ` · ${mentor.field}` : ''}
             </p>
-          </div>
-
-          <div>
-            <strong>Skills:</strong>
-            <p style={{ margin: '4px 0 0 0', color: '#555' }}>
-              {Array.isArray(mentor.skills) && mentor.skills.length > 0
-                ? mentor.skills.join(', ')
-                : 'Not specified'}
-            </p>
-          </div>
-
-          <div>
-            <strong>Session Rate:</strong>
-            <p style={{ margin: '4px 0 0 0', color: '#10b981', fontWeight: 700, fontSize: '1.1rem' }}>
-              {mentor.sessionPrice > 0 
-                ? `${mentor.currency || 'EGP'} ${Number(mentor.sessionPrice).toLocaleString()} / session` 
-                : 'Free / Not set'}
-            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px' }}>
+              <span style={{ color: '#f59e0b', fontWeight: '700', fontSize: '14px' }}>
+                ⭐ {mentor.rating ? Number(mentor.rating).toFixed(1) : 'New'}
+              </span>
+            </div>
           </div>
         </div>
 
-        <div style={{ marginTop: '24px', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+        <hr style={{ border: 'none', borderTop: '1px solid #f1f5f9', margin: '20px 0' }} />
+
+        {/* Bio Section */}
+        <div style={{ marginBottom: '20px' }}>
+          <span style={{ fontSize: '11px', fontWeight: '700', color: '#94a3b8', letterSpacing: '1px', textTransform: 'uppercase' }}>
+            ABOUT MENTOR
+          </span>
+          <p
+            style={{
+              color: bioText ? '#334155' : '#94a3b8',
+              fontSize: '14px',
+              marginTop: '6px',
+              lineHeight: '1.6',
+              fontStyle: bioText ? 'normal' : 'italic'
+            }}
+          >
+            {bioText || 'No bio available for this mentor yet.'}
+          </p>
+        </div>
+
+        {/* Skills Section */}
+        <div style={{ marginBottom: '24px' }}>
+          <span style={{ fontSize: '11px', fontWeight: '700', color: '#94a3b8', letterSpacing: '1px', textTransform: 'uppercase' }}>
+            SKILLS
+          </span>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+            {skillsList.length > 0 ? (
+              skillsList.map((skill, idx) => (
+                <span
+                  key={idx}
+                  style={{
+                    background: '#f1f5f9',
+                    color: '#334155',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    padding: '5px 12px',
+                    borderRadius: '8px',
+                    border: '1px solid #e2e8f0'
+                  }}
+                >
+                  {skill}
+                </span>
+              ))
+            ) : (
+              <span style={{ color: '#94a3b8', fontSize: '14px', fontStyle: 'italic' }}>
+                No skills listed.
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Price & Action Footer */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            background: '#f8fafc',
+            padding: '16px 20px',
+            borderRadius: '16px',
+            border: '1px solid #e2e8f0',
+            marginTop: '20px'
+          }}
+        >
+          <div>
+            <span style={{ fontSize: '11px', fontWeight: '700', color: '#94a3b8', letterSpacing: '1px', textTransform: 'uppercase' }}>
+              SESSION RATE
+            </span>
+            <div style={{ fontSize: '18px', fontWeight: '800', color: '#0f172a' }}>
+              {mentor.sessionPrice > 0
+                ? `${mentor.currency || 'EGP'} ${Number(mentor.sessionPrice).toLocaleString()} / session`
+                : 'Free / Not set'}
+            </div>
+          </div>
+
           {onOpenMessages && (
             <button
               onClick={() => {
-                onClose();
-                onOpenMessages(mentor);
+                onClose()
+                onOpenMessages(mentor)
               }}
               style={{
+                background: '#2563eb',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '10px',
                 padding: '10px 18px',
-                borderRadius: '6px',
-                border: '1px solid #0070f3',
-                background: '#ffffff',
-                color: '#0070f3',
+                fontSize: '14px',
+                fontWeight: '600',
                 cursor: 'pointer',
-                fontWeight: 600
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px'
               }}
             >
-              💬 Send Message
+              💬 Message
             </button>
           )}
-
-          <button
-            onClick={onClose}
-            style={{
-              padding: '10px 18px',
-              borderRadius: '6px',
-              border: 'none',
-              background: '#0070f3',
-              color: '#ffffff',
-              cursor: 'pointer',
-              fontWeight: 600
-            }}
-          >
-            Close
-          </button>
         </div>
       </div>
     </div>
