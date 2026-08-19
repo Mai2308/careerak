@@ -2465,3 +2465,205 @@ body.dark-mode button:has(.edit-icon) {
 body.dark-mode .profile-summary-panel button:hover {
   background: #334155 !important;
 }
+
+/* Mentor dashboard hero profile card */
+.mentor-hero-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  border: 1px solid #eef2f6;
+  margin-bottom: 24px;
+}
+
+.mentor-hero-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.mentor-hero-identity {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.mentor-hero-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.2);
+  flex-shrink: 0;
+}
+
+.mentor-hero-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mentor-hero-name {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.mentor-hero-badge {
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mentor-hero-meta {
+  color: #64748b;
+  font-size: 14px;
+  margin: 6px 0 0 0;
+  font-weight: 500;
+}
+
+.mentor-hero-edit-btn {
+  background: #f8fafc;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mentor-hero-edit-btn:hover {
+  background: #e2e8f0;
+}
+
+.mentor-hero-divider {
+  border: none;
+  border-top: 1px solid #f1f5f9;
+  margin: 24px 0;
+}
+
+.mentor-hero-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+.mentor-hero-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.mentor-hero-bio {
+  font-size: 14px;
+  margin-top: 6px;
+  line-height: 1.6;
+  color: #334155;
+}
+
+.mentor-hero-bio.is-empty,
+.mentor-hero-empty {
+  color: #94a3b8;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.mentor-hero-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.mentor-hero-skill-chip {
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.mentor-hero-price {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-top: 6px;
+}
+
+.mentor-hero-price.is-empty {
+  font-size: 14px;
+  font-weight: 500;
+  font-style: italic;
+  color: #94a3b8;
+}
+
+body.dark-mode .mentor-hero-card {
+  background: rgba(15, 23, 42, 0.92);
+  border-color: rgba(148, 163, 184, 0.22);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+}
+
+body.dark-mode .mentor-hero-name,
+body.dark-mode .mentor-hero-bio,
+body.dark-mode .mentor-hero-price {
+  color: #f8fafc !important;
+}
+
+body.dark-mode .mentor-hero-meta,
+body.dark-mode .mentor-hero-label,
+body.dark-mode .mentor-hero-bio.is-empty,
+body.dark-mode .mentor-hero-empty,
+body.dark-mode .mentor-hero-price.is-empty {
+  color: #cbd5e1 !important;
+}
+
+body.dark-mode .mentor-hero-badge {
+  background: rgba(37, 99, 235, 0.22);
+  color: #93c5fd !important;
+}
+
+body.dark-mode .mentor-hero-edit-btn {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: rgba(148, 163, 184, 0.3) !important;
+}
+
+body.dark-mode .mentor-hero-edit-btn:hover {
+  background: #334155 !important;
+}
+
+body.dark-mode .mentor-hero-divider {
+  border-top-color: rgba(148, 163, 184, 0.22);
+}
+
+body.dark-mode .mentor-hero-skill-chip {
+  background: rgba(30, 41, 59, 0.9);
+  color: #e2e8f0 !important;
+  border-color: rgba(148, 163, 184, 0.28);
+}
+
+body.dark-mode .mentor-hero-avatar {
+  color: #ffffff !important;
+}

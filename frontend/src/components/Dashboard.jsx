@@ -135,83 +135,18 @@ export default function Dashboard({
         ) : (
           <div>
             {/* Modern Hero Mentor Profile Card */}
-            <div
-              className="surface-panel mentor-hero-card"
-              style={{
-                background: "#ffffff",
-                borderRadius: "20px",
-                padding: "32px",
-                boxShadow: "0 10px 30px rgba(0, 0, 0, 0.04)",
-                border: "1px solid #eef2f6",
-                marginBottom: "24px",
-              }}
-            >
+            <div className="surface-panel mentor-hero-card">
               {/* Header Row */}
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  gap: "20px",
-                  flexWrap: "wrap",
-                }}
-              >
-                <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
-                  <div
-                    style={{
-                      width: "72px",
-                      height: "72px",
-                      borderRadius: "50%",
-                      background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
-                      color: "#ffffff",
-                      fontSize: "24px",
-                      fontWeight: "700",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      boxShadow: "0 8px 16px rgba(37, 99, 235, 0.2)",
-                      flexShrink: 0,
-                    }}
-                  >
-                    {initials}
-                  </div>
+              <div className="mentor-hero-header">
+                <div className="mentor-hero-identity">
+                  <div className="mentor-hero-avatar">{initials}</div>
 
                   <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                      <h2
-                        style={{
-                          fontSize: "26px",
-                          fontWeight: "800",
-                          color: "#0f172a",
-                          margin: 0,
-                          letterSpacing: "-0.5px",
-                        }}
-                      >
-                        {mentorProfile.name}
-                      </h2>
-                      <span
-                        style={{
-                          background: "#eff6ff",
-                          color: "#2563eb",
-                          fontSize: "12px",
-                          fontWeight: "700",
-                          padding: "4px 10px",
-                          borderRadius: "20px",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        Mentor
-                      </span>
+                    <div className="mentor-hero-name-row">
+                      <h2 className="mentor-hero-name">{mentorProfile.name}</h2>
+                      <span className="mentor-hero-badge">Mentor</span>
                     </div>
-                    <p
-                      style={{
-                        color: "#64748b",
-                        fontSize: "14px",
-                        margin: "6px 0 0 0",
-                        fontWeight: "500",
-                      }}
-                    >
+                    <p className="mentor-hero-meta">
                       {mentorProfile.title || "Mentor"} • {mentorProfile.category || "Technology"}
                       {mentorProfile.field ? ` · ${mentorProfile.field}` : ""}
                     </p>
@@ -219,55 +154,23 @@ export default function Dashboard({
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => setEditing(!editing)}
-                  style={{
-                    background: "#f8fafc",
-                    color: "#334155",
-                    border: "1px solid #cbd5e1",
-                    borderRadius: "12px",
-                    padding: "10px 20px",
-                    fontSize: "14px",
-                    fontWeight: "600",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                  }}
+                  className="mentor-hero-edit-btn"
                 >
                   {editing ? "Close Editor" : "✏️ Edit Profile"}
                 </button>
               </div>
 
-              <hr style={{ border: "none", borderTop: "1px solid #f1f5f9", margin: "24px 0" }} />
+              <hr className="mentor-hero-divider" />
 
               {/* Grid Details */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-                  gap: "24px",
-                  alignItems: "start",
-                }}
-              >
+              <div className="mentor-hero-grid">
                 {/* Bio */}
                 <div>
-                  <span
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: "700",
-                      color: "#94a3b8",
-                      letterSpacing: "1px",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    BIO
-                  </span>
+                  <span className="mentor-hero-label">BIO</span>
                   <p
-                    style={{
-                      color: mentorProfile.bio ? "#334155" : "#94a3b8",
-                      fontSize: "14px",
-                      marginTop: "6px",
-                      lineHeight: "1.6",
-                      fontStyle: mentorProfile.bio ? "normal" : "italic",
-                    }}
+                    className={`mentor-hero-bio${mentorProfile.bio ? "" : " is-empty"}`}
                   >
                     {mentorProfile.bio || "No bio added yet."}
                   </p>
@@ -275,63 +178,27 @@ export default function Dashboard({
 
                 {/* Skills */}
                 <div>
-                  <span
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: "700",
-                      color: "#94a3b8",
-                      letterSpacing: "1px",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    SKILLS & EXPERTISE
-                  </span>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "8px" }}>
+                  <span className="mentor-hero-label">SKILLS & EXPERTISE</span>
+                  <div className="mentor-hero-skills">
                     {skillsList.length > 0 ? (
                       skillsList.map((skill, index) => (
-                        <span
-                          key={index}
-                          style={{
-                            background: "#f1f5f9",
-                            color: "#334155",
-                            fontSize: "13px",
-                            fontWeight: "600",
-                            padding: "5px 12px",
-                            borderRadius: "8px",
-                            border: "1px solid #e2e8f0",
-                          }}
-                        >
+                        <span key={index} className="mentor-hero-skill-chip">
                           {skill}
                         </span>
                       ))
                     ) : (
-                      <span style={{ color: "#94a3b8", fontSize: "14px", fontStyle: "italic" }}>
-                        No skills added yet.
-                      </span>
+                      <span className="mentor-hero-empty">No skills added yet.</span>
                     )}
                   </div>
                 </div>
 
                 {/* Session Price */}
                 <div>
-                  <span
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: "700",
-                      color: "#94a3b8",
-                      letterSpacing: "1px",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    SESSION PRICE
-                  </span>
+                  <span className="mentor-hero-label">SESSION PRICE</span>
                   <div
-                    style={{
-                      fontSize: "20px",
-                      fontWeight: "800",
-                      color: "#0f172a",
-                      marginTop: "6px",
-                    }}
+                    className={`mentor-hero-price${
+                      mentorProfile.sessionPrice ? "" : " is-empty"
+                    }`}
                   >
                     {mentorProfile.sessionPrice
                       ? `${mentorProfile.currency || "EGP"} ${Number(
