@@ -2431,3 +2431,27 @@ body.dark-mode .price-currency-tag {
 body.dark-mode .price-input-field {
   color: #f8fafc !important;
 }
+/* Dark mode panel background override fix */
+body.dark-mode .surface-panel,
+body.dark-mode .card,
+body.dark-mode .profile-summary-panel {
+  background: rgba(15, 23, 42, 0.92) !important;
+  border-color: rgba(148, 163, 184, 0.22) !important;
+  color: var(--slate-900) !important;
+}
+
+/* Ensure inner text elements adapt to dark background */
+body.dark-mode .profile-name-row h2,
+body.dark-mode .profile-body p,
+body.dark-mode .profile-body p span,
+body.dark-mode .profile-body p strong {
+  color: #f8fafc !important;
+}
+
+/* Edit profile button in dark mode */
+body.dark-mode .secondary-button,
+body.dark-mode button:has(.edit-icon) {
+  background: rgba(30, 41, 59, 0.8);
+  color: #f8fafc;
+  border-color: rgba(148, 163, 184, 0.3);
+}
