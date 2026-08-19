@@ -26,7 +26,8 @@ function authRateLimit(req, res, next) {
   authAttempts.set(key, current);
   return next();
 }
-
+// CORRECT
+await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/register`, formData);
 // Register
 router.post('/register', authRateLimit, async (req, res) => {
   try {
