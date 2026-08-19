@@ -1,4 +1,5 @@
 import React from 'react'
+import careerakLogo from '../assets/logo.png'
 
 const featureCards = [
   { title: 'Find your fit', text: 'Compare mentors by field, rating and availability in seconds.' },
@@ -18,7 +19,7 @@ export default function Landing({
     <div className="landing">
       <header className="landing-header">
         <div className="brand-mark">
-          <img src="/logo.png" alt="Careerak Logo" className="logo-image" />
+          <img src={careerakLogo} alt="Careerak Logo" className="logo-image" />
         </div>
         
         <nav>

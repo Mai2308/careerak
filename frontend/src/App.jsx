@@ -9,6 +9,8 @@ import MessagesModal from './components/MessagesModal'
 import { getUnreadMessageCount } from './api'
 import Footer from "./components/Footer"
 import About from './components/About'
+import careerakLogo from './assets/logo.png'
+
 export default function App() {
   const [view, setView] = useState('landing')
   const [signupRole, setSignupRole] = useState('student')
@@ -122,7 +124,7 @@ export default function App() {
           {user ? (
             <>
               <div className="brand-mark" onClick={() => setView('dashboard')} style={{ cursor: 'pointer' }}>
-                <img src="/logo.png" alt="Careerak Logo" className="logo-image" />
+                <img src={careerakLogo} alt="Careerak Logo" className="logo-image" />
               </div>
               <nav>
                 <button className="link-button" onClick={() => setView('dashboard')}>
@@ -153,7 +155,7 @@ export default function App() {
           ) : (
             <>
               <div className="brand-mark" onClick={() => setView('landing')} style={{ cursor: 'pointer' }}>
-                <img src="/logo.png" alt="Careerak Logo" className="logo-image" />
+                <img src={careerakLogo} alt="Careerak Logo" className="logo-image" />
                 <span className="logo-text">Careerak</span>
               </div>
               <nav>
