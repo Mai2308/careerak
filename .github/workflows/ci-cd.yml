@@ -25,17 +25,27 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
 
-      - name: Install Dependencies
+      # --- Backend Checks ---
+      - name: Install Backend Dependencies
+        working-directory: ./backend
         run: npm ci
 
-      - name: Lint and Test (Optional)
-        run: |
-          npm run test --if-present
-          npm run lint --if-present
+      - name: Test Backend
+        working-directory: ./backend
+        run: npm run test --if-present
+
+      # --- Frontend Checks ---
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Test Frontend
+        working-directory: ./frontend
+        run: npm run test --if-present
 
       - name: Build Frontend
+        working-directory: ./frontend
         run: npm run build
         env:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
@@ -49,10 +59,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      # Example A: Deploying via Webhook (Render / Railway / DigitalOcean App Platform)
       - name: Trigger Backend Deployment
         run: |
           curl -X POST ${{ secrets.BACKEND_DEPLOY_HOOK }}
@@ -60,12 +66,3 @@ jobs:
       - name: Trigger Frontend Deployment
         run: |
           curl -X POST ${{ secrets.FRONTEND_DEPLOY_HOOK }}
-
-      # Example B: Deploying Frontend directly to Vercel (Uncomment if using Vercel)
-      # - name: Deploy Frontend to Vercel
-      #   uses: amondnet/vercel-action@v20
-      #   with:
-      #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
-      #     vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-      #     vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-      #     vercel-args: '--prod'
