@@ -1,5 +1,4 @@
-// db.js
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 let cached = global.mongoose;
 
@@ -13,12 +12,15 @@ async function dbConnect() {
   }
 
   if (!cached.promise) {
+    const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/careerak';
+    
     const opts = {
-      bufferCommands: false, // Prevents queries from buffering indefinitely
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 5000,
     };
 
-    cached.promise = mongoose.connect(process.env.MONGODB_URI, opts).then((mongoose) => {
-      return mongoose;
+    cached.promise = mongoose.connect(MONGO_URI, opts).then((mongooseInstance) => {
+      return mongooseInstance;
     });
   }
 
@@ -26,9 +28,10 @@ async function dbConnect() {
     cached.conn = await cached.promise;
   } catch (e) {
     cached.promise = null;
+    throw e;
   }
 
   return cached.conn;
 }
 
-export default dbConnect;
+module.exports = dbConnect;
