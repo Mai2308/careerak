@@ -20,11 +20,12 @@ router.get('/mentors', async (req, res) => {
     res.status(200).json(userMentors.map((mentor) => {
       const p = profileMap.get(mentor._id.toString());
       const cat = mentor.category || p?.category || (mentor.interests?.[0]) || (p?.interests?.[0]) || 'Technology';
+      const fld = mentor.fieldName || p?.field || (mentor.interests?.[1]) || (p?.interests?.[1]) || '';
       const interestsList = (mentor.interests && mentor.interests.length > 0)
         ? mentor.interests
         : (p?.interests && p.interests.length > 0)
           ? p.interests
-          : [cat];
+          : [cat, fld].filter(Boolean);
 
       return {
         id: mentor._id,
@@ -32,6 +33,7 @@ router.get('/mentors', async (req, res) => {
         name: mentor.name,
         email: mentor.email,
         category: cat,
+        field: fld,
         interests: interestsList,
         educationLevel: mentor.educationLevel || 'undergraduate',
         rating: mentor.rating || p?.averageRating || 0,
@@ -100,25 +102,30 @@ router.put('/me/interests', auth, async (req, res) => {
 // Update logged-in user profile
 router.put('/me', auth, async (req, res) => {
   try {
-    const { name, educationLevel, category, interests } = req.body;
+    const { name, educationLevel, category, field, interests } = req.body;
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     if (name && name.trim()) user.name = name.trim();
     if (educationLevel) user.educationLevel = educationLevel;
     if (category) user.category = category;
-    if (Array.isArray(interests)) user.interests = interests;
-    else if (category && (!user.interests || user.interests.length === 0)) {
-      user.interests = [category];
-    }
+    if (field) user.fieldName = field;
+
+    const interestList = [];
+    if (field) interestList.push(field);
+    if (category) interestList.push(category);
+    if (Array.isArray(interests)) interestList.push(...interests);
+    if (interestList.length > 0) user.interests = Array.from(new Set(interestList));
 
     await user.save();
 
-    // If user is a mentor, sync name and category to Mentor profile
+    // If user is a mentor, sync name, category, field, and interests to Mentor profile
     if (user.role === 'mentor') {
       const updateData = {};
       if (name) updateData.name = user.name;
       if (category) updateData.category = category;
+      if (field) updateData.field = field;
+      if (interestList.length > 0) updateData.interests = user.interests;
       await Mentor.findOneAndUpdate({ userId: user._id }, updateData, { upsert: false });
     }
 
@@ -131,6 +138,7 @@ router.put('/me', auth, async (req, res) => {
         role: user.role,
         educationLevel: user.educationLevel,
         category: user.category,
+        field: user.fieldName,
         interests: user.interests
       }
     });

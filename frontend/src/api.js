@@ -70,6 +70,18 @@ export async function getMyMentor() {
   const res = await fetch(`${API_BASE}/api/mentors/me`, { headers: authHeaders() })
   return parseResponse(res)
 }
+export async function updateMyMentor(payload) {
+  const res = await fetch(`${API_BASE}/api/mentors/me`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeaders()
+    },
+    body: JSON.stringify(payload)
+  })
+
+  return parseResponse(res)
+}
 
 export async function getMentors() {
   const res = await fetch(`${API_BASE}/api/users/mentors`)

@@ -8,6 +8,8 @@ const mentorSchema = new mongoose.Schema({
   bio: { type: String, default: '' },
   skills: { type: [String], default: [] },
   category: { type: String, default: '' },
+  field: { type: String, default: '' },
+  interests: { type: [String], default: [] },
   availableSlots: { type: [String], default: [] },
   sessionPrice: { type: Number, default: 0 },
   currency: { type: String, default: 'EGP' },

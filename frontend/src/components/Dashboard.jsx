@@ -79,11 +79,12 @@ export default function Dashboard({
       return cat === activeField || (m.interests || []).includes(activeField);
     })
     .filter((m) => m.name.toLowerCase().includes(search.trim().toLowerCase()))
-    .sort((a, b) =>
-      sortBy === "name"
-        ? a.name.localeCompare(b.name)
-        : (b.rating || 0) - (a.rating || 0),
-    );
+    .sort((a, b) => {
+      if (sortBy === "name") return a.name.localeCompare(b.name);
+      if (sortBy === "priceAsc") return (a.sessionPrice || 0) - (b.sessionPrice || 0);
+      if (sortBy === "priceDesc") return (b.sessionPrice || 0) - (a.sessionPrice || 0);
+      return (b.rating || 0) - (a.rating || 0);
+    });
 
   if (user.role === "mentor") {
     const averageRating =
@@ -146,8 +147,8 @@ export default function Dashboard({
 
               <div className="profile-body">
                 <p>
-                  <strong>Category</strong>
-                  <span>{mentorProfile.category || "Technology"}</span>
+                  <strong>Category & Field</strong>
+                  <span>{mentorProfile.category || "Technology"}{mentorProfile.field ? ` · ${mentorProfile.field}` : ''}</span>
                 </p>
                 <p>
                   <strong>Bio</strong>
@@ -293,6 +294,8 @@ export default function Dashboard({
           <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
             <option value="rating">Highest rated</option>
             <option value="name">Name (A-Z)</option>
+            <option value="priceAsc">Price: Low to High</option>
+            <option value="priceDesc">Price: High to Low</option>
           </select>
         </div>
 
@@ -351,11 +354,13 @@ export default function Dashboard({
                     ⭐ {mentor.rating ? mentor.rating.toFixed(1) : "New"}
                   </span>
                   <span className="muted">
-                    {mentor.category ||
-                      (mentor.interests?.length > 0
-                        ? mentor.interests.join(", ")
-                        : "Mentor")}
+                    {mentor.category || "Technology"}{mentor.field ? ` · ${mentor.field}` : (mentor.interests?.length > 0 ? ` · ${mentor.interests[0]}` : '')}
                   </span>
+                  {mentor.sessionPrice > 0 && (
+                    <span className="slot-price" style={{ fontSize: '0.88rem', fontWeight: 700, marginTop: '2px' }}>
+                      {mentor.currency || 'EGP'} {Number(mentor.sessionPrice).toLocaleString()} / session
+                    </span>
+                  )}
                 </div>
               );
             })}

@@ -7,7 +7,8 @@ import Profile from './components/Profile'
 import Explore from './components/Explore'
 import MessagesModal from './components/MessagesModal'
 import { getUnreadMessageCount } from './api'
-
+import Footer from "./components/Footer"
+import About from './components/About'
 export default function App() {
   const [view, setView] = useState('landing')
   const [signupRole, setSignupRole] = useState('student')
@@ -97,12 +98,18 @@ export default function App() {
 
   if (!user && view === 'landing') {
     return (
-      <Landing
-        onGetStarted={() => goToSignup('student')}
-        onFindMentor={() => goToSignup('student')}
-        onJoinAsMentor={() => goToSignup('mentor')}
-        onLogin={() => setView('login')}
-      />
+      <>
+        <Landing
+          onGetStarted={() => goToSignup('student')}
+          onFindMentor={() => goToSignup('student')}
+          onJoinAsMentor={() => goToSignup('mentor')}
+          onLogin={() => setView('login')}
+          darkMode={darkMode}
+          onToggleDarkMode={() => setDarkMode(!darkMode)}
+        />
+
+        <Footer onNavigate={(target) => setView(target)} onGoToSignup={goToSignup} />
+      </>
     )
   }
 
@@ -153,7 +160,10 @@ export default function App() {
                 <button className="link-button" onClick={() => setView('landing')}>
                   Home
                 </button>
-                <button className="link-button" onClick={() => setView('signup')}>
+                <button className="link-button" onClick={() => setView('about')}>
+                  About
+                </button>
+                <button className="link-button" onClick={() => goToSignup('student')}>
                   Sign up
                 </button>
                 <button className="link-button" onClick={() => setView('login')}>
@@ -188,18 +198,31 @@ export default function App() {
             />
           ) : view === 'explore' ? (
             <Explore onBack={() => setView('dashboard')} onOpenMessages={(mentor) => openMessagesWith(mentor)} />
+          ) : view === 'about' ? (
+            <About onNavigate={(target) => setView(target)} onGoToSignup={goToSignup} isLoggedIn={!!user} />
           ) : (
             <Dashboard
               user={user}
-              onViewProfile={()=>setView('profile')}
-              onExplore={()=>setView('explore')}
+              onViewProfile={() => setView('profile')}
+              onExplore={() => setView('explore')}
               onOpenMessages={(mentor) => openMessagesWith(mentor)}
             />
           )
         ) : view === 'signup' ? (
           <Signup initialRole={signupRole} onAuth={handleAuth} onBack={() => setView('landing')} />
-        ) : (
+        ) : view === 'login' ? (
           <Login onAuth={handleAuth} onBack={() => setView('landing')} />
+        ) : view === 'about' ? (
+          <About onNavigate={(target) => setView(target)} onGoToSignup={goToSignup} isLoggedIn={!!user} />
+        ) : (
+          <Landing
+            onGetStarted={() => goToSignup('student')}
+            onFindMentor={() => goToSignup('student')}
+            onJoinAsMentor={() => goToSignup('mentor')}
+            onLogin={() => setView('login')}
+            darkMode={darkMode}
+            onToggleDarkMode={() => setDarkMode(!darkMode)}
+          />
         )}
       </main>
 
@@ -211,6 +234,8 @@ export default function App() {
           initialRecipient={chatRecipient}
         />
       )}
+
+      <Footer onNavigate={(target) => setView(target)} onGoToSignup={goToSignup} />
     </div>
   )
 }

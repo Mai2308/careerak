@@ -1,26 +1,29 @@
 import React, { useEffect, useState } from 'react'
-import { getProfile, updateProfile, changePassword, deleteAccount } from '../api'
-import Interests from './Interests'
+import {
+  getProfile,
+  updateProfile,
+  getMyMentor,
+  createMentor,
+  changePassword,
+  deleteAccount
+} from '../api'
+import { CATEGORY_FIELDS_MAP } from './MentorProfile'
 
-const CATEGORY_OPTIONS = [
-  'Technology',
-  'Business & Finance',
-  'Design & Creative',
-  'Marketing',
-  'Engineering',
-  'Health & Science',
-  'Education'
-]
+const CATEGORY_OPTIONS = Object.keys(CATEGORY_FIELDS_MAP || {})
 
 export default function Profile({ user, onBack, onLogout, onUserUpdated }) {
+  const defaultCategory = user?.category || CATEGORY_OPTIONS[0] || ''
+  const availableFields = CATEGORY_FIELDS_MAP[defaultCategory] || CATEGORY_FIELDS_MAP[CATEGORY_OPTIONS[0]] || []
+  const defaultField = user?.field || availableFields[0] || ''
+
   const [profile, setProfile] = useState(user)
   const [loading, setLoading] = useState(true)
-  const [showInterests, setShowInterests] = useState(false)
 
   // Edit Profile form state
   const [name, setName] = useState(user?.name || '')
   const [educationLevel, setEducationLevel] = useState(user?.educationLevel || 'undergraduate')
-  const [category, setCategory] = useState(user?.category || CATEGORY_OPTIONS[0])
+  const [category, setCategory] = useState(defaultCategory)
+  const [field, setField] = useState(defaultField)
   const [profileMsg, setProfileMsg] = useState(null)
   const [profileSuccess, setProfileSuccess] = useState(null)
   const [savingProfile, setSavingProfile] = useState(false)
@@ -47,7 +50,14 @@ export default function Profile({ user, onBack, onLogout, onUserUpdated }) {
           setProfile(res.user)
           setName(res.user.name || '')
           setEducationLevel(res.user.educationLevel || 'undergraduate')
-          if (res.user.category) setCategory(res.user.category)
+
+          // Derive valid initial category & field from loaded profile data
+          const userCategory = res.user.category || CATEGORY_OPTIONS[0] || ''
+          const currentCategoryFields = CATEGORY_FIELDS_MAP[userCategory] || CATEGORY_FIELDS_MAP[CATEGORY_OPTIONS[0]] || []
+          const userField = res.user.field || currentCategoryFields[0] || ''
+
+          setCategory(userCategory)
+          setField(userField)
         }
       } catch (err) {
         if (!cancelled) setProfileMsg(err.message || 'Failed to load profile')
@@ -58,10 +68,6 @@ export default function Profile({ user, onBack, onLogout, onUserUpdated }) {
     load()
     return () => { cancelled = true }
   }, [])
-
-  if (showInterests) {
-    return <Interests onBack={() => setShowInterests(false)} />
-  }
 
   const handleSaveProfile = async (e) => {
     e.preventDefault()
@@ -78,6 +84,7 @@ export default function Profile({ user, onBack, onLogout, onUserUpdated }) {
       const payload = { name: name.trim() }
       if (profile?.role === 'mentor') {
         payload.category = category
+        payload.field = field
       } else {
         payload.educationLevel = educationLevel
       }
@@ -148,6 +155,9 @@ export default function Profile({ user, onBack, onLogout, onUserUpdated }) {
     .join('')
     .toUpperCase()
 
+  // Safely get available fields for the currently selected category
+  const activeFields = CATEGORY_FIELDS_MAP[category] || CATEGORY_FIELDS_MAP[CATEGORY_OPTIONS[0]] || []
+
   return (
     <div className="profile-page-container">
       <button className="link-button inline-back" onClick={onBack}>
@@ -165,7 +175,7 @@ export default function Profile({ user, onBack, onLogout, onUserUpdated }) {
               {profile?.role === 'mentor' ? '🎓 Mentor' : '🎓 Student'}
             </span>
             {profile?.role === 'mentor' ? (
-              <span className="profile-level-badge">{profile?.category || category}</span>
+              <span className="profile-level-badge">{profile?.category || category} · {profile?.field || field}</span>
             ) : (
               profile?.educationLevel && (
                 <span className="profile-level-badge">{profile.educationLevel}</span>
@@ -204,19 +214,40 @@ export default function Profile({ user, onBack, onLogout, onUserUpdated }) {
               </label>
 
               {profile?.role === 'mentor' ? (
-                <label className="field-label">
-                  <span>Mentor Category</span>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                  >
-                    {CATEGORY_OPTIONS.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                <>
+                  <label className="field-label">
+                    <span>Mentor Category</span>
+                    <select
+                      value={category}
+                      onChange={(e) => {
+                        const newCat = e.target.value
+                        setCategory(newCat)
+                        const newFields = CATEGORY_FIELDS_MAP[newCat] || CATEGORY_FIELDS_MAP[CATEGORY_OPTIONS[0]] || []
+                        setField(newFields[0] || '')
+                      }}
+                    >
+                      {CATEGORY_OPTIONS.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="field-label">
+                    <span>Mentor Field</span>
+                    <select
+                      value={field}
+                      onChange={(e) => setField(e.target.value)}
+                    >
+                      {activeFields.map((fld) => (
+                        <option key={fld} value={fld}>
+                          {fld}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </>
               ) : (
                 <label className="field-label">
                   <span>Education Level</span>
@@ -235,16 +266,6 @@ export default function Profile({ user, onBack, onLogout, onUserUpdated }) {
                 <button type="submit" disabled={savingProfile} className="pill-button">
                   {savingProfile ? 'Saving...' : 'Save Profile Changes'}
                 </button>
-
-                {profile?.role === 'student' && (
-                  <button
-                    type="button"
-                    className="pill-button outline"
-                    onClick={() => setShowInterests(true)}
-                  >
-                    Manage Interests
-                  </button>
-                )}
               </div>
             </form>
           </div>

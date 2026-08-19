@@ -5,6 +5,7 @@ const Category = require('../models/Category');
 const Field = require('../models/Field');
 const User = require('../models/User');
 const Availability = require('../models/Availability');
+const Mentor = require('../models/Mentor');
 
 // List all career categories
 router.get('/categories', auth, async (req, res) => {
@@ -30,7 +31,7 @@ router.get('/categories/:categoryId/fields', auth, async (req, res) => {
   }
 });
 
-// List all fields (flat), grouped-by-category on the client, e.g. for interest selection
+// List all fields (flat), grouped-by-category on the client
 router.get('/fields', auth, async (req, res) => {
   try {
     const fields = await Field.find().populate('category').sort({ name: 1 });
@@ -41,30 +42,76 @@ router.get('/fields', auth, async (req, res) => {
   }
 });
 
-// Find mentors (with available sessions) teaching any of the given field ids
+// Find mentors teaching any of the given field ids or matching category/field name exactly
 async function findMentorsForFields(fieldIds) {
-  const mentors = await User.find({ role: 'mentor', field: { $in: fieldIds } })
-    .select('name rating interests educationLevel field')
-    .populate('field');
+  const fields = await Field.find({ _id: { $in: fieldIds } }).populate('category');
+  const fieldNames = fields.map(f => f.name);
+  const categoryNames = fields.map(f => f.category?.name).filter(Boolean);
 
-  const mentorIds = mentors.map(m => m._id);
-  const availability = await Availability.find({
-    mentor: { $in: mentorIds },
-    isBooked: false,
-    date: { $gte: new Date() }
-  }).sort({ date: 1 });
+  const searchTerms = [...fieldNames, ...categoryNames];
+  const regexes = searchTerms.map(term => new RegExp(`^${term.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}$`, 'i'));
 
-  const sessionsByMentorId = availability.reduce((acc, a) => {
-    const key = String(a.mentor);
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(a);
-    return acc;
-  }, {});
+  // Query User collection for mentors matching this specific field/category
+  const userMentors = await User.find({
+    role: 'mentor',
+    $or: [
+      { field: { $in: fieldIds } },
+      { fieldName: { $in: [...fieldNames, ...regexes] } },
+      { interests: { $elemMatch: { $in: [...fieldNames, ...regexes] } } }
+    ]
+  }).select('name email rating interests category fieldName educationLevel sessionPrice currency');
 
-  return mentors.map(mentor => ({
-    ...mentor.toObject(),
-    availableSessions: sessionsByMentorId[String(mentor._id)] || []
-  }));
+  // Also query Mentor collection
+  const mentorDocs = await Mentor.find({
+    $or: [
+      { field: { $in: [...fieldNames, ...regexes] } },
+      { interests: { $elemMatch: { $in: [...fieldNames, ...regexes] } } }
+    ]
+  });
+
+  const mentorUserIds = mentorDocs.map(m => m.userId).filter(Boolean);
+  const extraUserMentors = await User.find({
+    _id: { $in: mentorUserIds },
+    role: 'mentor'
+  }).select('name email rating interests category fieldName educationLevel sessionPrice currency');
+
+  // Combine unique mentors
+  const mentorMap = new Map();
+  for (const m of [...userMentors, ...extraUserMentors]) {
+    mentorMap.set(m._id.toString(), m);
+  }
+
+  const matchingMentors = Array.from(mentorMap.values());
+  if (matchingMentors.length === 0) {
+    return [];
+  }
+
+  const mentorIds = matchingMentors.map(m => m._id);
+  const mentorProfiles = await Mentor.find({ userId: { $in: mentorIds } });
+  const profileMap = new Map(mentorProfiles.map(p => [p.userId?.toString(), p]));
+
+  return matchingMentors.map(mentor => {
+    const p = profileMap.get(mentor._id.toString());
+    const slots = p?.availableSlots || [];
+    const availableSessions = slots.map((d, i) => ({
+      _id: `${mentor._id}-slot-${i}`,
+      date: d,
+      duration: 45
+    }));
+
+    return {
+      _id: mentor._id,
+      id: mentor._id,
+      name: mentor.name,
+      rating: mentor.rating || p?.rating || 4.9,
+      category: mentor.category || p?.category || 'Technology',
+      field: mentor.fieldName || p?.field || '',
+      interests: mentor.interests || p?.interests || [],
+      sessionPrice: mentor.sessionPrice || p?.sessionPrice || 0,
+      currency: mentor.currency || p?.currency || 'EGP',
+      availableSessions
+    };
+  });
 }
 
 // Recommended mentors/sessions based on the logged-in student's chosen interests
@@ -99,16 +146,11 @@ router.get('/fields/:fieldId/mentors', auth, async (req, res) => {
 
     if (mentors.length === 0) {
       const relatedFields = await Field.find({ category: field.category._id, _id: { $ne: field._id } });
-      const relatedFieldIds = relatedFields.map(f => f._id);
-      const suggestions = relatedFieldIds.length
-        ? await User.distinct('field', { role: 'mentor', field: { $in: relatedFieldIds } })
-        : [];
-      const suggestedFields = await Field.find({ _id: { $in: suggestions } });
       return res.json({
         field,
         mentors: [],
         message: 'No mentors are currently available in this field.',
-        suggestions: suggestedFields
+        suggestions: relatedFields
       });
     }
 
