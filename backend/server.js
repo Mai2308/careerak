@@ -3,6 +3,7 @@ require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const express = require('express');
 const cors = require('cors');
+const dbConnect = require('./db');
 
 // Route Imports
 const authRoutes = require('./routes/auth');
@@ -52,6 +53,20 @@ app.options('*', cors(corsOptions)); // Respond directly to CORS preflight check
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Global Database Connection Middleware for Serverless
+app.use(async (req, res, next) => {
+  // Skip DB connection check for health check endpoint
+  if (req.path === '/api/health') return next();
+
+  try {
+    await dbConnect();
+    next();
+  } catch (error) {
+    console.error('Database connection error:', error);
+    res.status(500).json({ message: 'Database connection failed' });
+  }
+});
+
 // API Routes
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/api/auth', authRoutes);
@@ -64,7 +79,6 @@ app.use('/api/messages', messageRoutes);
 
 // Local Development Server Only (Ignored by Vercel serverless functions)
 if (require.main === module) {
-  const dbConnect = require('./db');
   const PORT = process.env.PORT || 5000;
 
   dbConnect().then(() => {

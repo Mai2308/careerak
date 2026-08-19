@@ -383,6 +383,12 @@ button.action:hover {
   padding: 10px 14px;
   border-radius: var(--radius-sm);
 }
+/* Dark theme style option */
+body.dark-mode .error-message {
+  background-color: rgba(224, 36, 36, 0.2); /* Translucent dark red */
+  color: #f87171;                          /* Bright red text */
+  border: 1px solid rgba(224, 36, 36, 0.4);
+}
 .msg {
   color: var(--rose-700);
   background: var(--rose-50);
