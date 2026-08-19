@@ -1,14 +1,11 @@
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
-if (!process.env.JWT_SECRET) {
-  process.env.JWT_SECRET = 'careerak-dev-secret';
-}
-
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
+// Route Imports
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const exploreRoutes = require('./routes/explore');
@@ -19,19 +16,31 @@ const messageRoutes = require('./routes/messages');
 
 const app = express();
 
-const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000')
-  .split(',')
-  .map(origin => origin.trim())
-  .filter(Boolean);
+// Fallback JWT Secret for Development
+if (!process.env.JWT_SECRET) {
+  process.env.JWT_SECRET = 'careerak-dev-secret';
+}
 
-app.use(cors({ 
+// Configurable CORS Origins (combines env vars and defaults)
+const envOrigins = (process.env.CORS_ORIGIN || '').split(',').map(o => o.trim()).filter(Boolean);
+const defaultOrigins = [
+  'https://careerak-frontend.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000'
+];
+const allowedOrigins = [...new Set([...envOrigins, ...defaultOrigins])];
+
+app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
-  }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
@@ -46,14 +55,13 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/mentors', mentorsRoutes);
 app.use('/api/messages', messageRoutes);
 
+// Database Connection & Server Startup
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/careerak';
 
 mongoose.connect(MONGO_URI)
   .then(() => console.log('Connected to MongoDB'))
-  .catch(err => {
-    console.error('Mongo connection error:', err);
-  });
+  .catch(err => console.error('Mongo connection error:', err));
 
 if (require.main === module) {
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
