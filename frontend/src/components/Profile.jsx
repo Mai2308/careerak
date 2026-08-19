@@ -1,26 +1,30 @@
 import React, { useEffect, useState } from 'react'
-import { getProfile, updateProfile, changePassword, deleteAccount } from '../api'
-import Interests from './Interests'
+import {
+  getProfile,
+  updateProfile,
+  getMyMentor,
+  createMentor,
+  changePassword,
+  deleteAccount
+} from '../api'
+import { CATEGORY_FIELDS_MAP } from './MentorProfile'
+import StudentPayments from './StudentPayments'
 
-const CATEGORY_OPTIONS = [
-  'Technology',
-  'Business & Finance',
-  'Design & Creative',
-  'Marketing',
-  'Engineering',
-  'Health & Science',
-  'Education'
-]
+const CATEGORY_OPTIONS = Object.keys(CATEGORY_FIELDS_MAP || {})
 
 export default function Profile({ user, onBack, onLogout, onUserUpdated }) {
+  const defaultCategory = user?.category || CATEGORY_OPTIONS[0] || ''
+  const availableFields = CATEGORY_FIELDS_MAP[defaultCategory] || CATEGORY_FIELDS_MAP[CATEGORY_OPTIONS[0]] || []
+  const defaultField = user?.field || availableFields[0] || ''
+
   const [profile, setProfile] = useState(user)
   const [loading, setLoading] = useState(true)
-  const [showInterests, setShowInterests] = useState(false)
 
   // Edit Profile form state
   const [name, setName] = useState(user?.name || '')
   const [educationLevel, setEducationLevel] = useState(user?.educationLevel || 'undergraduate')
-  const [category, setCategory] = useState(user?.category || CATEGORY_OPTIONS[0])
+  const [category, setCategory] = useState(defaultCategory)
+  const [field, setField] = useState(defaultField)
   const [profileMsg, setProfileMsg] = useState(null)
   const [profileSuccess, setProfileSuccess] = useState(null)
   const [savingProfile, setSavingProfile] = useState(false)
@@ -47,7 +51,14 @@ export default function Profile({ user, onBack, onLogout, onUserUpdated }) {
           setProfile(res.user)
           setName(res.user.name || '')
           setEducationLevel(res.user.educationLevel || 'undergraduate')
-          if (res.user.category) setCategory(res.user.category)
+
+          // Derive valid initial category & field from loaded profile data
+          const userCategory = res.user.category || CATEGORY_OPTIONS[0] || ''
+          const currentCategoryFields = CATEGORY_FIELDS_MAP[userCategory] || CATEGORY_FIELDS_MAP[CATEGORY_OPTIONS[0]] || []
+          const userField = res.user.field || currentCategoryFields[0] || ''
+
+          setCategory(userCategory)
+          setField(userField)
         }
       } catch (err) {
         if (!cancelled) setProfileMsg(err.message || 'Failed to load profile')
@@ -58,10 +69,6 @@ export default function Profile({ user, onBack, onLogout, onUserUpdated }) {
     load()
     return () => { cancelled = true }
   }, [])
-
-  if (showInterests) {
-    return <Interests onBack={() => setShowInterests(false)} />
-  }
 
   const handleSaveProfile = async (e) => {
     e.preventDefault()
@@ -78,6 +85,7 @@ export default function Profile({ user, onBack, onLogout, onUserUpdated }) {
       const payload = { name: name.trim() }
       if (profile?.role === 'mentor') {
         payload.category = category
+        payload.field = field
       } else {
         payload.educationLevel = educationLevel
       }
@@ -148,6 +156,9 @@ export default function Profile({ user, onBack, onLogout, onUserUpdated }) {
     .join('')
     .toUpperCase()
 
+  // Safely get available fields for the currently selected category
+  const activeFields = CATEGORY_FIELDS_MAP[category] || CATEGORY_FIELDS_MAP[CATEGORY_OPTIONS[0]] || []
+
   return (
     <div className="profile-page-container">
       <button className="link-button inline-back" onClick={onBack}>
@@ -165,7 +176,7 @@ export default function Profile({ user, onBack, onLogout, onUserUpdated }) {
               {profile?.role === 'mentor' ? '🎓 Mentor' : '🎓 Student'}
             </span>
             {profile?.role === 'mentor' ? (
-              <span className="profile-level-badge">{profile?.category || category}</span>
+              <span className="profile-level-badge">{profile?.category || category} · {profile?.field || field}</span>
             ) : (
               profile?.educationLevel && (
                 <span className="profile-level-badge">{profile.educationLevel}</span>
@@ -178,138 +189,163 @@ export default function Profile({ user, onBack, onLogout, onUserUpdated }) {
       {loading ? (
         <div className="surface-panel">Loading profile...</div>
       ) : (
-        <div className="profile-sections-grid">
-          {/* Section 1: Personal Information */}
-          <div className="surface-panel profile-section-card">
-            <h3 className="section-card-title">Personal Information</h3>
-            <p className="muted">Update your profile details and education level.</p>
+        <>
+          <div className="profile-sections-grid">
+            {/* Section 1: Personal Information */}
+            <div className="surface-panel profile-section-card">
+              <h3 className="section-card-title">Personal Information</h3>
+              <p className="muted">Update your profile details and education level.</p>
 
-            {profileMsg && <div className="error-message" style={{ marginTop: 12 }}>{profileMsg}</div>}
-            {profileSuccess && <div className="success-message" style={{ marginTop: 12 }}>{profileSuccess}</div>}
+              {profileMsg && <div className="error-message" style={{ marginTop: 12 }}>{profileMsg}</div>}
+              {profileSuccess && <div className="success-message" style={{ marginTop: 12 }}>{profileSuccess}</div>}
 
-            <form onSubmit={handleSaveProfile} className="profile-form">
-              <label className="field-label">
-                <span>Full Name</span>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Your Name"
-                />
-              </label>
-
-              <label className="field-label">
-                <span>Email Address (Read-only)</span>
-                <input type="email" value={profile?.email || ''} disabled />
-              </label>
-
-              {profile?.role === 'mentor' ? (
+              <form onSubmit={handleSaveProfile} className="profile-form">
                 <label className="field-label">
-                  <span>Mentor Category</span>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                  >
-                    {CATEGORY_OPTIONS.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
+                  <span>Full Name</span>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Your Name"
+                  />
                 </label>
-              ) : (
+
                 <label className="field-label">
-                  <span>Education Level</span>
-                  <select
-                    value={educationLevel}
-                    onChange={(e) => setEducationLevel(e.target.value)}
-                  >
-                    <option value="undergraduate">Undergraduate</option>
-                    <option value="graduate">Graduate</option>
-                    <option value="other">Other</option>
-                  </select>
+                  <span>Email Address (Read-only)</span>
+                  <input type="email" value={profile?.email || ''} disabled />
                 </label>
-              )}
 
-              <div className="profile-form-actions">
-                <button type="submit" disabled={savingProfile} className="pill-button">
-                  {savingProfile ? 'Saving...' : 'Save Profile Changes'}
-                </button>
+                {profile?.role === 'mentor' ? (
+                  <>
+                    <label className="field-label">
+                      <span>Mentor Category</span>
+                      <select
+                        value={category}
+                        onChange={(e) => {
+                          const newCat = e.target.value
+                          setCategory(newCat)
+                          const newFields = CATEGORY_FIELDS_MAP[newCat] || CATEGORY_FIELDS_MAP[CATEGORY_OPTIONS[0]] || []
+                          setField(newFields[0] || '')
+                        }}
+                      >
+                        {CATEGORY_OPTIONS.map((cat) => (
+                          <option key={cat} value={cat}>
+                            {cat}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
 
-                {profile?.role === 'student' && (
-                  <button
-                    type="button"
-                    className="pill-button outline"
-                    onClick={() => setShowInterests(true)}
-                  >
-                    Manage Interests
-                  </button>
+                    <label className="field-label">
+                      <span>Mentor Field</span>
+                      <select
+                        value={field}
+                        onChange={(e) => setField(e.target.value)}
+                      >
+                        {activeFields.map((fld) => (
+                          <option key={fld} value={fld}>
+                            {fld}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </>
+                ) : (
+                  <label className="field-label">
+                    <span>Education Level</span>
+                    <select
+                      value={educationLevel}
+                      onChange={(e) => setEducationLevel(e.target.value)}
+                    >
+                      <option value="undergraduate">Undergraduate</option>
+                      <option value="graduate">Graduate</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </label>
                 )}
-              </div>
-            </form>
-          </div>
 
-          {/* Section 2: Security & Password */}
-          <div className="surface-panel profile-section-card">
-            <h3 className="section-card-title">Security & Password</h3>
-            <p className="muted">Ensure your account is using a strong password.</p>
+                <div className="profile-form-actions">
+                  <button type="submit" disabled={savingProfile} className="pill-button">
+                    {savingProfile ? 'Saving...' : 'Save Profile Changes'}
+                  </button>
+                </div>
+              </form>
+            </div>
 
-            {passwordMsg && <div className="error-message" style={{ marginTop: 12 }}>{passwordMsg}</div>}
-            {passwordSuccess && <div className="success-message" style={{ marginTop: 12 }}>{passwordSuccess}</div>}
+            {/* Section 2: Security & Password */}
+            <div className="surface-panel profile-section-card">
+              <h3 className="section-card-title">Security & Password</h3>
+              <p className="muted">Ensure your account is using a strong password.</p>
 
-            <form onSubmit={handleChangePassword} className="profile-form">
-              <label className="field-label">
-                <span>Current Password</span>
-                <input
-                  type="password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="••••••••"
-                />
-              </label>
+              {passwordMsg && <div className="error-message" style={{ marginTop: 12 }}>{passwordMsg}</div>}
+              {passwordSuccess && <div className="success-message" style={{ marginTop: 12 }}>{passwordSuccess}</div>}
 
-              <label className="field-label">
-                <span>New Password</span>
-                <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Minimum 6 characters"
-                />
-              </label>
+              <form onSubmit={handleChangePassword} className="profile-form">
+                <label className="field-label">
+                  <span>Current Password</span>
+                  <input
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder="••••••••"
+                  />
+                </label>
 
-              <label className="field-label">
-                <span>Confirm New Password</span>
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Re-type new password"
-                />
-              </label>
+                <label className="field-label">
+                  <span>New Password</span>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Minimum 6 characters"
+                  />
+                </label>
 
-              <button type="submit" disabled={changingPwd} className="secondary-button" style={{ alignSelf: 'flex-start', padding: '12px 24px', borderRadius: '999px', fontWeight: '700' }}>
-                {changingPwd ? 'Updating...' : 'Update Password'}
+                <label className="field-label">
+                  <span>Confirm New Password</span>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Re-type new password"
+                  />
+                </label>
+
+                <button
+                  type="submit"
+                  disabled={changingPwd}
+                  className="secondary-button"
+                  style={{ alignSelf: 'flex-start', padding: '12px 24px', borderRadius: '999px', fontWeight: '700' }}
+                >
+                  {changingPwd ? 'Updating...' : 'Update Password'}
+                </button>
+              </form>
+            </div>
+
+            {/* Section 3: Danger Zone */}
+            <div className="surface-panel profile-section-card danger-zone-card">
+              <h3 className="section-card-title danger-title">Danger Zone</h3>
+              <p className="muted">
+                Permanently delete your Careerak account and all associated profile data.
+              </p>
+
+              <button
+                type="button"
+                className="delete-account-btn"
+                onClick={() => setShowDeleteModal(true)}
+              >
+                Delete Account
               </button>
-            </form>
+            </div>
           </div>
 
-          {/* Section 3: Danger Zone */}
-          <div className="surface-panel profile-section-card danger-zone-card">
-            <h3 className="section-card-title danger-title">Danger Zone</h3>
-            <p className="muted">
-              Permanently delete your Careerak account and all associated profile data.
-            </p>
-
-            <button
-              type="button"
-              className="delete-account-btn"
-              onClick={() => setShowDeleteModal(true)}
-            >
-              Delete Account
-            </button>
-          </div>
-        </div>
+          {/* Section 4: Student Payment History & Methods */}
+          {(profile?.role === 'student' || user?.role === 'student') && (
+            <div style={{ marginTop: '24px' }}>
+              <StudentPayments user={profile || user} />
+            </div>
+          )}
+        </>
       )}
 
       {/* Delete Account Confirmation Modal */}

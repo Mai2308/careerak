@@ -1,0 +1,136 @@
+.mentor-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999; /* Increased to ensure it floats on top of everything */
+  padding: 16px;
+}
+
+.mentor-modal-content {
+  position: relative;
+  width: 100%;
+  max-width: 540px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 4px 8px;
+  border-radius: 50%;
+}
+
+.modal-close-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #111827;
+}
+
+.mentor-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.mentor-modal-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #10b981;
+}
+
+.mentor-modal-title h2 {
+  margin: 0 0 4px 0;
+  font-size: 1.5rem;
+}
+
+.mentor-role-badge {
+  display: inline-block;
+  font-weight: 600;
+  color: #10b981;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.mentor-company {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 4px 0 0 0;
+}
+
+.mentor-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mentor-info-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.info-chip {
+  background: rgba(16, 185, 129, 0.08);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.mentor-section h4 {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+  color: #374151;
+}
+
+.mentor-section p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.skills-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skill-tag {
+  background: rgba(0, 0, 0, 0.05);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: #4b5563;
+}
+
+.mentor-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}

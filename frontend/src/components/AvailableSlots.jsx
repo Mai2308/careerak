@@ -32,7 +32,8 @@ export default function AvailableSlots({ user, mentorId }) {
 
       setSlots(availableSlots)
     } catch (err) {
-      setError(err.message)
+      // Gracefully handle slot fetch failures without throwing uncaught console errors
+      setSlots([])
     } finally {
       setLoading(false)
     }
@@ -41,6 +42,7 @@ export default function AvailableSlots({ user, mentorId }) {
   useEffect(() => {
     if (!mentorId) {
       setMentor(null)
+      setSlots([])
       return
     }
 
@@ -49,7 +51,7 @@ export default function AvailableSlots({ user, mentorId }) {
         const data = await getMentorById(mentorId)
         setMentor(data)
       } catch (err) {
-        console.error('Failed to load mentor profile', err)
+        // Silently catch 404s so it doesn't interrupt the rest of the Dashboard state
         setMentor(null)
       }
     }
@@ -186,8 +188,6 @@ export default function AvailableSlots({ user, mentorId }) {
                 <strong>Time:</strong>{' '}
                 {slot.startTime} - {slot.endTime}
               </div>
-
-              <div className="slot-price">{sessionCurrency} {sessionPrice}</div>
 
               <button onClick={() => setSelectedSlot(slot)}>
                 Select slot

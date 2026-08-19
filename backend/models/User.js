@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
   interests: { type: [String], default: [] },
   educationLevel: { type: String, enum: ['undergraduate','graduate','other'], default: 'undergraduate' },
   category: { type: String, default: '' },
+  fieldName: { type: String, default: '' },
   field: { type: mongoose.Schema.Types.ObjectId, ref: 'Field' },
   interestedFields: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Field' }],
   sessionPrice: { type: Number, default: 0 },

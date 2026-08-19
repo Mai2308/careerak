@@ -85,10 +85,10 @@ export default function Explore({ onBack, onOpenMessages }){
       {!loading && step === 'categories' && (
         <div>
           <p>Browse career categories:</p>
-          <ul>
+          <ul className="explore-option-grid">
             {categories.map(cat => (
               <li key={cat._id}>
-                <button onClick={()=>openCategory(cat)}>{cat.name}</button>
+                <button className="explore-option" onClick={()=>openCategory(cat)}>{cat.name}</button>
               </li>
             ))}
           </ul>
@@ -99,10 +99,10 @@ export default function Explore({ onBack, onOpenMessages }){
         <div>
           <button className="link-button inline-back" onClick={backToCategories}>&larr; Categories</button>
           <h3>{selectedCategory?.name} fields</h3>
-          <ul>
+          <ul className="explore-option-grid">
             {fields.map(f => (
               <li key={f._id}>
-                <button onClick={()=>openField(f)}>{f.name}</button>
+                <button className="explore-option" onClick={()=>openField(f)}>{f.name}</button>
               </li>
             ))}
           </ul>
@@ -117,10 +117,10 @@ export default function Explore({ onBack, onOpenMessages }){
           {mentors.length === 0 && suggestions.length > 0 && (
             <div>
               <p>You might be interested in these related fields instead:</p>
-              <ul>
+              <ul className="explore-option-grid">
                 {suggestions.map(f => (
                   <li key={f._id}>
-                    <button onClick={()=>openField(f)}>{f.name}</button>
+                    <button className="explore-option" onClick={()=>openField(f)}>{f.name}</button>
                   </li>
                 ))}
               </ul>

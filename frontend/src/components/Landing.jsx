@@ -6,7 +6,14 @@ const featureCards = [
   { title: 'Grow faster', text: 'Get honest feedback and keep moving toward your next career step.' }
 ]
 
-export default function Landing({ onGetStarted, onFindMentor, onJoinAsMentor, onLogin }) {
+export default function Landing({
+  onGetStarted,
+  onFindMentor,
+  onJoinAsMentor,
+  onLogin,
+  darkMode,
+  onToggleDarkMode
+}) {
   return (
     <div className="landing">
       <header className="landing-header">
@@ -15,6 +22,9 @@ export default function Landing({ onGetStarted, onFindMentor, onJoinAsMentor, on
         </div>
         
         <nav>
+          <button type="button" className="theme-toggle" onClick={onToggleDarkMode}>
+            {darkMode ? '☀️ Light' : '🌙 Dark'}
+          </button>
           <button className="link-button" onClick={onLogin}>Log in</button>
           <button className="pill-button" onClick={onGetStarted}>Get started</button>
         </nav>

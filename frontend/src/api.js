@@ -71,6 +71,19 @@ export async function getMyMentor() {
   return parseResponse(res)
 }
 
+export async function updateMyMentor(payload) {
+  const res = await fetch(`${API_BASE}/api/mentors/me`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeaders()
+    },
+    body: JSON.stringify(payload)
+  })
+
+  return parseResponse(res)
+}
+
 export async function getMentors() {
   const res = await fetch(`${API_BASE}/api/users/mentors`)
   return parseResponse(res)
@@ -219,7 +232,7 @@ export async function createBooking(payload) {
 }
 
 export async function getStudentBookings(studentId) {
-  const res = await fetch(`${API_BASE}/api/bookings/student/${studentId}`)
+  const res = await fetch(`${API_BASE}/api/bookings/student/${studentId}`, { headers: authHeaders() })
   return parseResponse(res)
 }
 
