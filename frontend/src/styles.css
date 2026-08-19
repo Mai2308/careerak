@@ -2455,3 +2455,30 @@ body.dark-mode button:has(.edit-icon) {
   color: #f8fafc;
   border-color: rgba(148, 163, 184, 0.3);
 }
+/* Fix dark mode profile typography and contrast */
+body.dark-mode .profile-name-row h2,
+body.dark-mode .profile-summary-panel h2,
+body.dark-mode .profile-meta h2,
+body.dark-mode .welcome-title {
+  color: #f8fafc !important;
+}
+
+body.dark-mode .profile-body p,
+body.dark-mode .profile-body p span,
+body.dark-mode .profile-body p strong,
+body.dark-mode .profile-title,
+body.dark-mode .muted {
+  color: #cbd5e1 !important;
+}
+
+/* Edit Profile button dark mode fix */
+body.dark-mode .profile-summary-panel button,
+body.dark-mode .profile-name-row button {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
+}
+
+body.dark-mode .profile-summary-panel button:hover {
+  background: #334155 !important;
+}
