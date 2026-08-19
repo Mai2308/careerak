@@ -874,6 +874,10 @@ body.dark-mode .feature-icon {
   color: var(--emerald-700);
 }
 
+body.dark-mode .role-toggle button:not(.active) {
+  color: #000 !important;
+}
+
 .field-label {
   display: flex;
   flex-direction: column;
