@@ -21,7 +21,7 @@ if (!process.env.JWT_SECRET) {
   process.env.JWT_SECRET = 'careerak-dev-secret';
 }
 
-// Configurable CORS Origins (combines env vars and defaults)
+// Configurable CORS Origins
 const allowedOrigins = [
   'https://careerak-frontend.vercel.app',
   'http://localhost:5173',
@@ -30,10 +30,8 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow non-browser requests (Postman, curl)
     if (!origin) return callback(null, true);
 
-    // Check fixed origins or match any *.vercel.app domain
     const isVercelDomain = /\.vercel\.app$/.test(origin);
     const isAllowed = allowedOrigins.includes(origin) || isVercelDomain;
 
@@ -47,6 +45,10 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Body Parsing Middleware (MUST come before routes)
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // API Routes
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
