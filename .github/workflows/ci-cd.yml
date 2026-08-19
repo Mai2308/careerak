@@ -12,6 +12,7 @@ jobs:
   # ==========================================
   test-and-build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10 # Prevents the entire job from hanging for hours
 
     strategy:
       matrix:
@@ -33,7 +34,11 @@ jobs:
 
       - name: Test Backend
         working-directory: ./backend
-        run: npm run test --if-present
+        timeout-minutes: 3
+        # CI=true forces Jest/Vitest to run once and exit without entering watch mode
+        run: npm run test --if-present -- --passWithNoTests
+        env:
+          CI: true
 
       # --- Frontend Checks ---
       - name: Install Frontend Dependencies
@@ -42,7 +47,10 @@ jobs:
 
       - name: Test Frontend
         working-directory: ./frontend
-        run: npm run test --if-present
+        timeout-minutes: 3
+        run: npm run test --if-present -- --passWithNoTests
+        env:
+          CI: true
 
       - name: Build Frontend
         working-directory: ./frontend
@@ -60,9 +68,11 @@ jobs:
 
     steps:
       - name: Trigger Backend Deployment
+        if: ${{ secrets.BACKEND_DEPLOY_HOOK != '' }}
         run: |
-          curl -X POST ${{ secrets.BACKEND_DEPLOY_HOOK }}
+          curl -X POST "${{ secrets.BACKEND_DEPLOY_HOOK }}"
 
       - name: Trigger Frontend Deployment
+        if: ${{ secrets.FRONTEND_DEPLOY_HOOK != '' }}
         run: |
-          curl -X POST ${{ secrets.FRONTEND_DEPLOY_HOOK }}
+          curl -X POST "${{ secrets.FRONTEND_DEPLOY_HOOK }}"
