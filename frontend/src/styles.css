@@ -2431,49 +2431,32 @@ body.dark-mode .price-currency-tag {
 body.dark-mode .price-input-field {
   color: #f8fafc !important;
 }
-/* Dark mode panel background override fix */
-body.dark-mode .surface-panel,
-body.dark-mode .card,
-body.dark-mode .profile-summary-panel {
-  background: rgba(15, 23, 42, 0.92) !important;
-  border-color: rgba(148, 163, 184, 0.22) !important;
-  color: var(--slate-900) !important;
-}
-
-/* Ensure inner text elements adapt to dark background */
-body.dark-mode .profile-name-row h2,
-body.dark-mode .profile-body p,
-body.dark-mode .profile-body p span,
-body.dark-mode .profile-body p strong {
+/* Universal Dark Mode Overrides for Profile & Card Components */
+body.dark-mode .surface-panel *,
+body.dark-mode .profile-summary-panel *,
+body.dark-mode .card * {
   color: #f8fafc !important;
 }
 
-/* Edit profile button in dark mode */
-body.dark-mode .secondary-button,
-body.dark-mode button:has(.edit-icon) {
-  background: rgba(30, 41, 59, 0.8);
-  color: #f8fafc;
-  border-color: rgba(148, 163, 184, 0.3);
-}
-/* Fix dark mode profile typography and contrast */
-body.dark-mode .profile-name-row h2,
-body.dark-mode .profile-summary-panel h2,
-body.dark-mode .profile-meta h2,
-body.dark-mode .welcome-title {
-  color: #f8fafc !important;
-}
-
-body.dark-mode .profile-body p,
-body.dark-mode .profile-body p span,
+/* Light Muted Text Sublabels (BIO, SKILLS, SESSION PRICE, Mentor tag) */
 body.dark-mode .profile-body p strong,
+body.dark-mode .profile-body p span,
 body.dark-mode .profile-title,
-body.dark-mode .muted {
-  color: #cbd5e1 !important;
+body.dark-mode .muted,
+body.dark-mode .mini-label {
+  color: #94a3b8 !important;
 }
 
-/* Edit Profile button dark mode fix */
+/* Session Price Value Accent */
+body.dark-mode .profile-body p strong + span,
+body.dark-mode .slot-price {
+  color: #34d399 !important;
+}
+
+/* Edit Profile Button */
 body.dark-mode .profile-summary-panel button,
-body.dark-mode .profile-name-row button {
+body.dark-mode .profile-name-row button,
+body.dark-mode button:has(.edit-icon) {
   background: #1e293b !important;
   color: #f8fafc !important;
   border: 1px solid rgba(148, 163, 184, 0.3) !important;
