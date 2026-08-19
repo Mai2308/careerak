@@ -22,17 +22,22 @@ if (!process.env.JWT_SECRET) {
 }
 
 // Configurable CORS Origins (combines env vars and defaults)
-const envOrigins = (process.env.CORS_ORIGIN || '').split(',').map(o => o.trim()).filter(Boolean);
-const defaultOrigins = [
+const allowedOrigins = [
   'https://careerak-frontend.vercel.app',
   'http://localhost:5173',
   'http://localhost:3000'
 ];
-const allowedOrigins = [...new Set([...envOrigins, ...defaultOrigins])];
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+    // Allow non-browser requests (Postman, curl)
+    if (!origin) return callback(null, true);
+
+    // Check fixed origins or match any *.vercel.app domain
+    const isVercelDomain = /\.vercel\.app$/.test(origin);
+    const isAllowed = allowedOrigins.includes(origin) || isVercelDomain;
+
+    if (isAllowed) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -42,8 +47,6 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
-app.use(express.json());
 
 // API Routes
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
