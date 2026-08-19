@@ -5,6 +5,7 @@ import AvailableSlots from "./AvailableSlots";
 import StudentBookings from "./StudentBookings";
 import { getMyMentor, getMentors, getMentorReviews } from "../api";
 import MentorProfile from "./MentorProfile";
+import MentorModal from "./MentorModal";
 
 export default function Dashboard({
   user,
@@ -17,6 +18,7 @@ export default function Dashboard({
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [mentors, setMentors] = useState([]);
   const [selectedMentorId, setSelectedMentorId] = useState("");
+  const [modalMentor, setModalMentor] = useState(null);
   const [loadingMentors, setLoadingMentors] = useState(false);
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -333,7 +335,10 @@ export default function Dashboard({
                 <div
                   key={id}
                   className={`mentor-card${selectedMentorId === id ? " active" : ""}`}
-                  onClick={() => setSelectedMentorId(id)}
+                  onClick={() => {
+                    setSelectedMentorId(id);
+                    setModalMentor(mentor);
+                  }}
                   style={{ cursor: "pointer" }}
                 >
                   <div className="mentor-card-header">
@@ -370,6 +375,15 @@ export default function Dashboard({
 
       <AvailableSlots user={user} mentorId={selectedMentorId} />
       <StudentBookings user={user} />
+
+      {/* Popup Modal */}
+      {modalMentor && (
+        <MentorModal
+          mentor={modalMentor}
+          onClose={() => setModalMentor(null)}
+          onOpenMessages={onOpenMessages}
+        />
+      )}
     </div>
   );
 }

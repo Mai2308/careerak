@@ -327,22 +327,44 @@ router.get('/', async (req, res) => {
 // =====================================================
 router.get('/:id', async (req, res) => {
   try {
-    const mentor = await Mentor.findById(req.params.id)
-
-    if (!mentor) {
-      return res.status(404).json({
-        message: 'Mentor not found'
-      })
+    const { id } = req.params;
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ message: 'Invalid ID format' });
     }
 
-    res.json(mentor)
-  } catch (err) {
-    console.error(err)
+    // 1. Try finding by Mentor _id
+    let mentor = await Mentor.findById(id);
 
-    res.status(500).json({
-      message: 'Server error'
-    })
+    // 2. Try finding by userId
+    if (!mentor) {
+      mentor = await Mentor.findOne({ userId: id });
+    }
+
+    // 3. Fallback: Search User collection directly
+    if (!mentor) {
+      const userMentor = await User.findOne({ _id: id, role: 'mentor' }).lean();
+      if (userMentor) {
+        mentor = {
+          _id: userMentor._id,
+          name: userMentor.name,
+          email: userMentor.email,
+          sessionPrice: userMentor.sessionPrice || 0,
+          currency: userMentor.currency || 'EGP',
+          category: userMentor.category || userMentor.fieldName,
+          rating: userMentor.rating || 0
+        };
+      }
+    }
+
+    if (!mentor) {
+      return res.status(404).json({ message: 'Mentor not found' });
+    }
+
+    res.json(mentor);
+  } catch (err) {
+    console.error('Error fetching mentor:', err);
+    res.status(500).json({ message: 'Server error' });
   }
-})
+});
 
 module.exports = router
