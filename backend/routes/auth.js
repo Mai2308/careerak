@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-
-// Note: Replace User model require path with your actual Mongoose User model location
-// e.g., const User = require('../models/User');
+const bcrypt = require('bcryptjs'); // Ensure bcryptjs or bcrypt is installed
+const User = require('../models/User'); // Adjust if your User model is located elsewhere
 
 const JWT_SECRET = process.env.JWT_SECRET || 'careerak-dev-secret';
 
@@ -16,18 +15,42 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'Name, email, and password are required.' });
     }
 
-    // Example user creation logic:
-    // const existingUser = await User.findOne({ email });
-    // if (existingUser) return res.status(400).json({ message: 'User already exists' });
-    // const user = await User.create({ name, email, password, role, interests, educationLevel });
+    // 1. Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists with this email.' });
+    }
 
-    // Mock response structure (adjust to fit your User model/database execution):
-    const mockUser = { id: 'user_id', name, email, role: role || 'student' };
-    const token = jwt.sign({ id: mockUser.id, role: mockUser.role }, JWT_SECRET, { expiresIn: '7d' });
+    // 2. Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
+    // 3. Save new user to MongoDB
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role: role || 'student',
+      interests: interests || [],
+      educationLevel: educationLevel || 'undergraduate'
+    });
+
+    // 4. Generate JWT
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    // 5. Respond with token and user payload
     return res.status(201).json({
       token,
-      user: mockUser
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
     });
   } catch (error) {
     console.error('Registration error:', error);
@@ -44,12 +67,37 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Email and password are required.' });
     }
 
-    // Add your authentication logic here
+    // 1. Find user in MongoDB
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid credentials.' });
+    }
 
-    return res.status(200).json({ message: 'Login endpoint active' });
+    // 2. Compare password against hash
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials.' });
+    }
+
+    // 3. Generate token
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    return res.status(200).json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    });
   } catch (error) {
     console.error('Login error:', error);
-    return res.status(500).json({ message: 'Server error during login' });
+    return res.status(500).json({ message: error.message || 'Server error during login' });
   }
 });
 
