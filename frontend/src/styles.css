@@ -384,7 +384,9 @@ button.action:hover {
   border-radius: var(--radius-sm);
 }
 /* Dark theme style option */
-body.dark-mode .error-message {
+body.dark-mode .error-message,
+body.dark-mode .msg,
+body.dark-mode .error-list {
   background-color: rgba(224, 36, 36, 0.2); /* Translucent dark red */
   color: #f87171;                          /* Bright red text */
   border: 1px solid rgba(224, 36, 36, 0.4);
@@ -1359,6 +1361,9 @@ body.dark-mode .explore-option:hover {
   font-size: 1.1rem;
   font-weight: 800;
   color: var(--emerald-700);
+}
+body.dark-mode .star-rating {
+  color: #6ee7b7;
 }
 .review-card p {
   margin: 0;
@@ -2446,6 +2451,26 @@ body.dark-mode .surface-panel *,
 body.dark-mode .profile-summary-panel *,
 body.dark-mode .card * {
   color: #f8fafc !important;
+}
+
+/* Error text and star ratings keep their own color even inside a card/surface-panel */
+body.dark-mode .error-message,
+body.dark-mode .msg,
+body.dark-mode .error-list,
+body.dark-mode .error-list li {
+  color: #f87171 !important;
+}
+body.dark-mode .star-rating {
+  color: #6ee7b7 !important;
+}
+body.dark-mode .rating-summary-stars {
+  color: #f59e0b !important;
+}
+body.dark-mode .star-picker-button {
+  color: var(--slate-400) !important;
+}
+body.dark-mode .star-picker-button.filled {
+  color: #f59e0b !important;
 }
 
 /* Light Muted Text Sublabels (BIO, SKILLS, SESSION PRICE, Mentor tag) */
