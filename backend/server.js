@@ -21,11 +21,11 @@ if (!process.env.JWT_SECRET) {
   process.env.JWT_SECRET = 'careerak-dev-secret';
 }
 
-// Configurable CORS Origins
+// Configurable CORS Origins (CORS_ORIGIN in .env, comma-separated)
 const allowedOrigins = [
   'https://careerak-frontend.vercel.app',
   'http://localhost:5173',
-  'http://localhost:3000'
+  ...(process.env.CORS_ORIGIN || 'http://localhost:3000').split(',').map(o => o.trim())
 ];
 
 const corsOptions = {
