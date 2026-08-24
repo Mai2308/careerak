@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI Pipeline
 
 on:
   push:
@@ -8,11 +8,11 @@ on:
 
 jobs:
   # ==========================================
-  # 1. CONTINUOUS INTEGRATION (CI)
+  # CONTINUOUS INTEGRATION (CI)
   # ==========================================
   test-and-build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10 # Prevents the entire job from hanging for hours
+    timeout-minutes: 10 # Prevents the job from hanging indefinitely
 
     strategy:
       matrix:
@@ -35,7 +35,6 @@ jobs:
       - name: Test Backend
         working-directory: ./backend
         timeout-minutes: 3
-        # CI=true forces Jest/Vitest to run once and exit without entering watch mode
         run: npm run test --if-present -- --passWithNoTests
         env:
           CI: true
@@ -55,28 +54,3 @@ jobs:
       - name: Build Frontend
         working-directory: ./frontend
         run: npm run build
-        env:
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
-
-  # ==========================================
-  # 2. CONTINUOUS DEPLOYMENT (CD)
-  # ==========================================
-  deploy:
-    needs: test-and-build
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Trigger Backend Deployment
-        env:
-          BACKEND_HOOK: ${{ secrets.BACKEND_DEPLOY_HOOK }}
-        if: env.BACKEND_HOOK != ''
-        run: |
-          curl -X POST "$BACKEND_HOOK"
-
-      - name: Trigger Frontend Deployment
-        env:
-          FRONTEND_HOOK: ${{ secrets.FRONTEND_DEPLOY_HOOK }}
-        if: env.FRONTEND_HOOK != ''
-        run: |
-          curl -X POST "$FRONTEND_HOOK"
