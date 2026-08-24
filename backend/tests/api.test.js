@@ -2,6 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const supertest = require('supertest');
 const { MongoMemoryServer } = require('mongodb-memory-server');
+const mongoose = require('mongoose');
 
 let mongoServer;
 let request;
@@ -20,6 +21,8 @@ test.before(async () => {
 });
 
 test.after(async () => {
+  await mongoose.disconnect();
+
   if (mongoServer) {
     await mongoServer.stop();
   }
