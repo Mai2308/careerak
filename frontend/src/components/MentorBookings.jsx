@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import {
-  getMentorBookings
+  getMentorBookings,
+  cancelBooking
 } from '../api'
 
 export default function MentorBookings({ user }) {
   const [bookings, setBookings] = useState([])
   const [error, setError] = useState('')
+  const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(true)
 
   async function loadBookings() {
@@ -26,11 +28,26 @@ export default function MentorBookings({ user }) {
     loadBookings()
   }, [user.id])
 
+  async function handleCancel(bookingId) {
+    try {
+      setError('')
+      setMessage('')
+
+      await cancelBooking(bookingId)
+
+      setMessage('Booking cancelled successfully')
+      await loadBookings()
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
   return (
     <div className="surface-panel booking-panel">
       <h3 className="panel-title light">UPCOMING BOOKINGS</h3>
 
       {error && <p className="msg">{error}</p>}
+  {message && <p className="success-message">{message}</p>}
 
       {loading ? (
         <div className="booking-empty">Loading bookings...</div>
@@ -59,6 +76,11 @@ export default function MentorBookings({ user }) {
                   {booking.availabilityId?.startTime || '00:00'}
                 </div>
                 <div className="booking-status">{booking.status === 'confirmed' ? 'Confirmed' : booking.status}</div>
+                {(booking.status === 'pending' || booking.status === 'confirmed') && (
+                  <button className="secondary-button compact" onClick={() => handleCancel(booking._id)}>
+                    Cancel
+                  </button>
+                )}
               </div>
             </div>
           ))}

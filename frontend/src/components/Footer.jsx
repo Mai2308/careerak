@@ -29,15 +29,12 @@ function Footer({ onNavigate, onGoToSignup }) {
         <div className="footer-section">
           <h3>Quick Links</h3>
           <a href="#" onClick={handleNav('landing')}>Home</a>
-          <a href="#" onClick={handleNav('explore')}>Categories</a>
-          <a href="#" onClick={handleNav('explore')}>Explore Mentors</a>
           <a href="#" onClick={handleNav('about')}>About Us</a>
         </div>
 
         {/* Students */}
         <div className="footer-section">
           <h3>For Students</h3>
-          <a href="#" onClick={handleNav('explore')}>Explore Fields</a>
           <a href="#" onClick={handleNav('explore')}>Find a Mentor</a>
           <a href="#" onClick={handleSignup('student')}>Create Account</a>
         </div>
