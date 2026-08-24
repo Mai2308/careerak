@@ -20,7 +20,7 @@ router.post('/register', async (req, res) => {
     // 1. Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: 'User already exists with this email.' });
+      return res.status(400).json({ message: 'Email already in use' });
     }
 
     // 2. Hash password
@@ -45,7 +45,7 @@ router.post('/register', async (req, res) => {
     );
 
     // 5. Respond with token and user payload
-    return res.status(201).json({
+    return res.status(200).json({
       token,
       user: {
         id: user._id,
