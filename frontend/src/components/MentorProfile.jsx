@@ -38,7 +38,6 @@ export default function MentorProfile({ initial = null, onSaved }){
     field: initialField,
     bio: initial?.bio || '',
     skills: (initial?.skills || []).join(', '),
-    availableSlots: (initial?.availableSlots || []).join(', '),
     sessionPrice: initial?.sessionPrice ?? ''
   })
   const [loading, setLoading] = useState(false)
@@ -62,7 +61,6 @@ export default function MentorProfile({ initial = null, onSaved }){
         field: form.field,
         bio: form.bio,
         skills: form.skills.split(',').map(s=>s.trim()).filter(Boolean),
-        availableSlots: form.availableSlots.split(',').map(s=>s.trim()).filter(Boolean),
         sessionPrice: numericPrice || 0,
         currency: 'EGP'
       }
@@ -110,7 +108,6 @@ export default function MentorProfile({ initial = null, onSaved }){
       </label>
       <textarea placeholder="Bio" value={form.bio} onChange={e=>setForm({...form,bio:e.target.value})} />
       <input placeholder="Skills (comma separated)" value={form.skills} onChange={e=>setForm({...form,skills:e.target.value})} />
-      <input placeholder="Available slots (comma separated)" value={form.availableSlots} onChange={e=>setForm({...form,availableSlots:e.target.value})} />
       <div className="price-input-wrapper">
         <span className="price-currency-tag">EGP</span>
         <input
