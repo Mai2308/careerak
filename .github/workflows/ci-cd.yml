@@ -35,7 +35,7 @@ jobs:
       - name: Test Backend
         working-directory: ./backend
         timeout-minutes: 3
-        run: npm run test --if-present -- --passWithNoTests
+        run: npm test --if-present
         env:
           CI: true
 
@@ -47,7 +47,7 @@ jobs:
       - name: Test Frontend
         working-directory: ./frontend
         timeout-minutes: 3
-        run: npm run test --if-present -- --passWithNoTests
+        run: npm test --if-present
         env:
           CI: true
 
