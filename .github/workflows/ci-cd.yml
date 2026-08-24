@@ -68,11 +68,15 @@ jobs:
 
     steps:
       - name: Trigger Backend Deployment
-        if: ${{ secrets.BACKEND_DEPLOY_HOOK != '' }}
+        env:
+          BACKEND_HOOK: ${{ secrets.BACKEND_DEPLOY_HOOK }}
+        if: env.BACKEND_HOOK != ''
         run: |
-          curl -X POST "${{ secrets.BACKEND_DEPLOY_HOOK }}"
+          curl -X POST "$BACKEND_HOOK"
 
       - name: Trigger Frontend Deployment
-        if: ${{ secrets.FRONTEND_DEPLOY_HOOK != '' }}
+        env:
+          FRONTEND_HOOK: ${{ secrets.FRONTEND_DEPLOY_HOOK }}
+        if: env.FRONTEND_HOOK != ''
         run: |
-          curl -X POST "${{ secrets.FRONTEND_DEPLOY_HOOK }}"
+          curl -X POST "$FRONTEND_HOOK"
